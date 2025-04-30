@@ -46,6 +46,7 @@ import Footer from "@/app/(chat)/chat/footer";
 import HeaderActions from "@/app/(chat)/chat/header-actions";
 import {DeepSeekIcon, PanelLeftClose, PanelLeftOpen} from "@/components/Icons";
 import AvatarDropdown from "@/app/(chat)/chat/avatar-dropdown";
+import FileUpload from "@/app/(chat)/chat/file-upload";
 
 // APIs
 import {
@@ -689,13 +690,12 @@ const ChatPage = (props: ChatProps) => {
                     </Tooltip>
                 </Flex>
 
-                <Flex align='center' gap='small'>
-                    <Tooltip title={'上传附件'} placement='top'>
-                        <Button
-                            type='text'
-                            icon={<PaperClipOutlined rotate={135} style={{fontSize: '18px', marginTop: '7px'}}/>}
-                        />
-                    </Tooltip>
+                <Flex gap='small'>
+                    <FileUpload onUploadSuccess={(files) => {
+                        // 处理上传成功的文件
+                        console.log('上传的文件:', files);
+                        // 这里可以添加文件处理逻辑
+                    }} />
                     {
                         !agent.isRequesting() ?
                             (
@@ -709,7 +709,6 @@ const ChatPage = (props: ChatProps) => {
                             )
                     }
                 </Flex>
-
             </Flex>
         );
     }

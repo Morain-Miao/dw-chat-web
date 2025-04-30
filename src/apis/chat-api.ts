@@ -86,8 +86,14 @@ export interface VoteParam {
     voteType: string;
 }
 
-
-
+// 文件上传响应
+export interface UploadFileVO {
+    fileId: string;
+    fileName: string;
+    fileSize: number;
+    fileType: string;
+    fileUrl: string;
+}
 
 /**
  * 查询会话列表 API
@@ -159,5 +165,19 @@ export const  saveVoteAPI = async (param: VoteParam) => {
     const response: ApiResponse<string> = await clientFetcher(url, options);
     return response;
 }
+
+// 文件上传API
+export const uploadFileAPI = async (file: File): Promise<ApiResponse<UploadFileVO>> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return await clientFetcher('/chat/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
 
 
