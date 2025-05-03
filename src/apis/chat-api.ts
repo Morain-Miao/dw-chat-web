@@ -180,4 +180,24 @@ export const uploadFileAPI = async (file: File): Promise<ApiResponse<UploadFileV
     });
 };
 
+// 批量文件上传API
+export const uploadFilesBatchAPI = async (
+  files: File[],
+  userId: string,
+  expireHours?: number
+): Promise<ApiResponse<boolean>> => {
+  const formData = new FormData();
+  files.forEach(file => formData.append('files', file));
+  formData.append('userId', userId);
+  if (expireHours !== undefined) {
+    formData.append('expireHours', expireHours.toString());
+  }
+
+  return await clientFetcher('/api/v1/files/upload/batch', {
+    method: 'POST',
+    body: formData,
+    // 不要设置 Content-Type，浏览器会自动处理 multipart/form-data
+  });
+};
+
 

@@ -15,8 +15,12 @@ import {loginAPI, logoutAPI} from "@/apis/user-api";
 import {message} from "antd";
 
 export interface User {
+    userId: string;
     username: string;
     token: string;
+    expireTime: number;
+    loginTime: number;
+    ipaddr: string;
 }
 
 interface AuthContextType {
@@ -69,11 +73,12 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
     // 使用 useCallback 避免函数引用变化
     const login = useCallback(async (username: string, password: string) => {
             const resp = await loginAPI({username, password});
+            
             if (resp.code === 200) {
-                const u: User = {username, token: resp.data}
+                const u: User = {username, token: resp.data.token, userId: resp.data.userId, expireTime: resp.data.expireTime, loginTime: resp.data.loginTime, ipaddr: resp.data.ipaddr}
                 setUser(u);
                 // 使用 cookies 存储登录信息
-                await setUserCookieAction(username, resp.data)
+                await setUserCookieAction(resp.data)
                 return u
             } else {
                 setUser(null)

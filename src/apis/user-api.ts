@@ -1,6 +1,7 @@
 import {appConfig} from "@/utils/appConfig";
 import type {ApiResponse} from "@/apis/index";
 import {clientFetcher} from "@/utils/fetcher";
+import type { User } from "@/components/provider/auth-provider";
 
 
 /**
@@ -65,7 +66,7 @@ export const loginAPI = async ({username, password}: LoginParam) => {
             password
         }),
     }
-    const response: ApiResponse<string> = await clientFetcher(url, options);
+    const response: ApiResponse<User> = await clientFetcher(url, options);
     //console.log('loginAPI response:', JSON.stringify(response));
     return response;
 }

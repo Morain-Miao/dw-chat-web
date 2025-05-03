@@ -31,15 +31,14 @@ export async function loginAction(username: string, password: string) {
         }),
     }
     const resp: ApiResponse<string> = await fetch(url, options).then(resp => resp.json());
-    if (resp.code === 200) {
+    if (resp.code === 200 && resp.data) {
         console.log('登录成功')
         // 使用 cookies 存储登录信息
-        await setUserCookieAction(username, resp.data)
+        const user = resp.data as unknown as User;
+        await setUserCookieAction(user);
+        return user;
     }
-    return {
-        username: username,
-        token: resp.data
-    };
+    return null;
 }
 
 /**
@@ -48,16 +47,16 @@ export async function loginAction(username: string, password: string) {
  * @param username
  * @param token
  */
-export async function setUserCookieAction(username: string, token: string) {
+export async function setUserCookieAction(user: User) {
     const cookie = await cookies();
     cookie.set(COOKIE_USER,
-        JSON.stringify({username, token}),
+        JSON.stringify(user),
         {
             path: '/',
             httpOnly: false, // ❗必须为 false，客户端才能读取
             //secure: process.env.NODE_ENV === 'production', // 设置了 secure: true，只能在 https 环境下  Cookies.get 到 Cookie。
             //sameSite: 'strict', // 设置了 sameSite: 'strict'，请求是从同一站点发起的，才能 Cookies.get 到 Cookie。
-            maxAge: 60 * 60 * 24 * 1 // 1 days
+            maxAge: 60 * 60 * 24 * 7 // 7 days
         }
     );
     console.log('储存登录用户信息')
