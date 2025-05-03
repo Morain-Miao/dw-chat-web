@@ -139,10 +139,32 @@ const ChatPage = (props: ChatProps) => {
         return (
             <Flex align='center'>
                 {logo}
-                {<span
-                    className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">
-                    {title}
-                </span>}
+                <div style={{ marginLeft: 10, lineHeight: 1.1, minWidth: 140, textAlign: 'left' }}>
+                    <div
+                        style={{
+                            fontSize: 20, // 中文字号大一些
+                            fontWeight: 'bold',
+                            background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            letterSpacing: '0.5em', // 增加字间距让整体更宽
+                        }}
+                    >
+                        燕桥中学
+                    </div>
+                    <div
+                        style={{
+                            fontSize: 7, // 英文字号适当
+                            fontWeight: 'bold',
+                            background: 'linear-gradient(to right, #22d3ee, #3b82f6)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            letterSpacing: '0.15em', // 英文适当加字间距
+                        }}
+                    >
+                        CAMBRIDGE HIGH SCHOOL
+                    </div>
+                </div>
             </Flex>
         )
     }
@@ -431,7 +453,7 @@ const ChatPage = (props: ChatProps) => {
                     onSuccess: (chunk) => {
                         //console.log('onSuccess， chunk：', JSON.stringify(chunk));
                         //console.log('onSuccess， aiMessage：', JSON.stringify(aiMessage));
-                        onAgentSuccess(aiMessage);
+                        onAgentSuccess([aiMessage]);
                     },
                     onError: (error) => {
                         console.log('onError', error);

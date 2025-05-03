@@ -6,7 +6,7 @@ const Logo = () => {
         <div className='w-12 ml-1.5'>
             <Image
                 className="dark:invert"
-                src="/whale4.svg"
+                src="/logo.svg"
                 alt="dw chat logo"
                 width={38}
                 height={38}
