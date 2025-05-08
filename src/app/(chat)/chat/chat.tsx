@@ -37,7 +37,7 @@ import {SiderMenuProps} from "@ant-design/pro-layout/es/components/SiderMenu/Sid
 import type {HeaderViewProps} from "@ant-design/pro-layout/es/components/Header";
 import {Conversation} from "@ant-design/x/es/conversations";
 import {MessageInfo} from "@ant-design/x/es/use-x-chat";
-
+import Cookies from "js-cookie";
 // Local components
 import MarkdownRender from "@/app/(chat)/chat/markdown-render";
 import InitWelcome from "@/app/(chat)/chat/init-welcome";
@@ -64,9 +64,11 @@ import {
 // Utils & Providers
 import {appConfig} from "@/utils/appConfig";
 import {useTheme} from "@/components/provider/theme-provider";
-import {useAuth} from "@/components/provider/auth-provider";
+import {useAuth, User} from "@/components/provider/auth-provider";
 import type {ProLayoutProps} from "@ant-design/pro-components";
 import dynamic from 'next/dynamic';
+import { COOKIE_USER } from '@/utils/constant';
+import { getCurrentUserId } from '@/utils/IdUtil';
 
 
 // 动态导入
@@ -217,7 +219,12 @@ const ChatPage = (props: ChatProps) => {
         if (msg) {
             let chatId: string = ''
             const chatName = msg.length > 10 ? msg.substring(0, 10) : msg
-            const resp = await saveChatAPI({chatId, chatName})
+
+            const resp = await saveChatAPI({
+                chatId,
+                chatName,
+                userId: getCurrentUserId()
+            })
             if (resp.code === 200) {
                 // 初始化会话记录列表
                 await initConversations()
@@ -263,6 +270,7 @@ const ChatPage = (props: ChatProps) => {
         const resp = await saveChatAPI({
             chatId: key,
             chatName: label,
+            userId: getCurrentUserId()
         })
         if (resp.code == 200) {
             await initConversations()
@@ -453,7 +461,7 @@ const ChatPage = (props: ChatProps) => {
                     onSuccess: (chunk) => {
                         //console.log('onSuccess， chunk：', JSON.stringify(chunk));
                         //console.log('onSuccess， aiMessage：', JSON.stringify(aiMessage));
-                        onAgentSuccess([aiMessage]);
+                        onAgentSuccess(aiMessage);
                     },
                     onError: (error) => {
                         console.log('onError', error);

@@ -7,5 +7,6 @@ export const appConfig = {
   clientHost: process.env.NEXT_PUBLIC_CLIENT_HOST,
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   apiProxyTargetUrl: process.env.NEXT_PUBLIC_API_PROXY_TARGIT_URL,
+  apiCoreUrl: process.env.NEXT_PUBLIC_CORE_API_TARGIT_URL,
   apiStreamChatUrl: process.env.NEXT_PUBLIC_STREAM_CHAT_API_URL,
 }

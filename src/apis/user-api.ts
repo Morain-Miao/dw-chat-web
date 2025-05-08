@@ -1,6 +1,6 @@
 import {appConfig} from "@/utils/appConfig";
 import type {ApiResponse} from "@/apis/index";
-import {clientFetcher} from "@/utils/fetcher";
+import {clientCoreFetcher, clientFetcher} from "@/utils/fetcher";
 import type { User } from "@/components/provider/auth-provider";
 
 
@@ -46,7 +46,7 @@ export const  registerAPI = async ({username, email, password}: RegisterParam) =
             password,
         }),
     }
-    const response: ApiResponse<string> = await clientFetcher(url, options);
+    const response: ApiResponse<string> = await clientCoreFetcher(url, options);
     //console.log('registerAPI response:', JSON.stringify(response));
     return response;
 }
@@ -66,7 +66,8 @@ export const loginAPI = async ({username, password}: LoginParam) => {
             password
         }),
     }
-    const response: ApiResponse<User> = await clientFetcher(url, options);
+    console.log('loginAPI url:', url)
+    const response: ApiResponse<User> = await clientCoreFetcher(url, options);
     //console.log('loginAPI response:', JSON.stringify(response));
     return response;
 }
@@ -80,7 +81,7 @@ export const logoutAPI = async () => {
     const options = {
         method: "DELETE",
     }
-    const response: ApiResponse<void> = await clientFetcher(url, options);
+    const response: ApiResponse<void> = await clientCoreFetcher(url, options);
     return response;
 }
 
@@ -93,6 +94,6 @@ export const queryUserAPI = async () => {
     const options = {
         method: "GET",
     }
-    const response: ApiResponse<string> = await clientFetcher(url, options);
+    const response: ApiResponse<string> = await clientCoreFetcher(url, options);
     return response;
 }

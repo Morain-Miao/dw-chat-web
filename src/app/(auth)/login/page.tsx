@@ -51,17 +51,19 @@ const LoginPage = () => {
 
     // 执行登录操作
     const handleLogin = async (formData: Record<string, any>) => {
+        console.log('handleLogin 被触发', formData);
         const username: string = formData.username;
         const password: string = formData.password;
-
-
         const user = await login(username, password);
+        
+        console.log('user:', user);
         if (user) {
-            messageApi.success('登录成功')
-            console.log('登录成功')
-            router.push('/')
-            //console.log('登录成功后跳回之前要去的页面:', redirect)
-            //router.replace(redirect);
+            messageApi.success('登录成功');
+            setTimeout(() => {
+                // window.location.href = '/';
+                router.push('/');
+            }, 5000);
+            
         } else {
             messageApi.error('登录失败')
             console.log('user is null')
@@ -103,7 +105,7 @@ const LoginPage = () => {
                         className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 ml-2">
                             {appConfig.appName}
                            </span>}
-                    subTitle="AI 聊天页面"
+                    subTitle="AI 聊天式管理系统"
                     actions={
                         <Space>
                             其他登录方式
@@ -133,7 +135,7 @@ const LoginPage = () => {
                         <>
                             <ProFormText
                                 name="username"
-                                placeholder={'用户名: dawei'}
+                                placeholder={'用户名: '}
                                 fieldProps={{
                                     size: 'large',
                                     prefix: <UserOutlined className={'prefixIcon'}/>,
@@ -147,7 +149,7 @@ const LoginPage = () => {
                             />
                             <ProFormText.Password
                                 name="password"
-                                placeholder={'密码: 123456'}
+                                placeholder={'密码: '}
                                 fieldProps={{
                                     size: 'large',
                                     prefix: <LockOutlined className={'prefixIcon'}/>,

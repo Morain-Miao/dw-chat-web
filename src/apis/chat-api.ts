@@ -9,6 +9,7 @@ import {clientFetcher} from "@/utils/fetcher";
 export interface ChatRecord {
     chatId: string;
     chatName: string;
+    userId: string;
 }
 
 /**
@@ -115,7 +116,7 @@ export const  queryChatPageAPI = async (param: RecordPageParam) => {
  * 保存会话 API
  */
 export const  saveChatAPI = async (param: ChatRecord) => {
-    const url = `/chat/saveChat`;
+    const url = `/chat/save`;
     const options = {
         method: "POST",
         body: JSON.stringify(param),
@@ -129,7 +130,7 @@ export const  saveChatAPI = async (param: ChatRecord) => {
  * 删除会话 API
  */
 export const  deleteChatAPI = async (chatId: string) => {
-    const url = `/chat/deleteChat/${chatId}`;
+    const url = `/chat/delete/${chatId}`;
     const options = {
         method: "DELETE",
     }
@@ -157,7 +158,7 @@ export const  queryMessageListAPI = async (chatId: string) => {
  * 点赞/踩 API
  */
 export const  saveVoteAPI = async (param: VoteParam) => {
-    const url = `/vote/saveVote`;
+    const url = `/vote/save`;
     const options = {
         method: "POST",
         body: JSON.stringify(param),

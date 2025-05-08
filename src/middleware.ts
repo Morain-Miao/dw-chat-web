@@ -50,7 +50,7 @@ export default middleware;
 export const config = {
     matcher: [
         '/dwc/api/:path*',
-        '/dev/dwc/api/:path*',
+        '/api/v1/:path*',
         //'/api/:path*',
     ],
 }
