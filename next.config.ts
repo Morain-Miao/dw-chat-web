@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
                 source: `${appConfig.apiBaseUrl}/:path*`,
                 destination: `${appConfig.apiProxyTargetUrl}/:path*`, // 代理后的目标地址
             },
+            {
+                source: '/chat/stream',
+                destination: `${appConfig.apiStreamChatUrl}`, // 代理到后端服务
+            },
         ];
     },
 };

@@ -32,6 +32,7 @@ export interface RecordPageParam extends PageParam {
 export interface StreamChatParam {
     chatId: string;
     content: string;
+    userId: string;
     modelId?: string;
     openReasoning?: boolean;
     openSearch?: boolean;

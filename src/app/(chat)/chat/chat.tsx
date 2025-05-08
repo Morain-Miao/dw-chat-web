@@ -392,16 +392,15 @@ const ChatPage = (props: ChatProps) => {
 
     // 模型连接信息
     const xRequest = XRequest({
-        //baseURL:  http://localhost:9500/chat/streamChat,
-        baseURL:  `${appConfig.apiStreamChatUrl}`,
+        baseURL: `${appConfig.apiStreamChatUrl}`,  // 使用相对路径，通过 Next.js 代理
         fetch: async (url, options) => {
-            return  fetch(url, {
+            return fetch(url, {
                 ...options,
                 headers: {
                     "Authorization": `Bearer ${user?.token || ''}`,
                     ...options?.headers,
                 },
-                signal: abortControllerRef.current?.signal, // 控制停止
+                signal: abortControllerRef.current?.signal,
             })
         }
     });
@@ -413,8 +412,6 @@ const ChatPage = (props: ChatProps) => {
         request: async (info, callbacks) => {
             const {message, messages} = info
             const {onUpdate: onAgentUpdate, onSuccess: onAgentSuccess, onError: onAgentError} = callbacks;
-            //console.log('message', message)
-            console.log('message list:', JSON.stringify(messages))
 
             const aiMessage: AIAgentMessage = {
                 type: 'ai',
@@ -430,6 +427,7 @@ const ChatPage = (props: ChatProps) => {
                     content: message?.content || '',
                     openReasoning: message?.openReasoning,
                     openSearch: message?.openSearch,
+                    userId: getCurrentUserId(),
                 },
                 {
                     onUpdate: (chunk) => {
@@ -455,7 +453,8 @@ const ChatPage = (props: ChatProps) => {
                             //console.log('onAgentUpdate， aiMessage：', JSON.stringify(aiMessage));
                             onAgentUpdate(aiMessage);
                         } catch (e) {
-                            console.log('onUpdate fail：', e);
+                            console.error('onUpdate fail:', e);
+                            console.error('Received chunk:', chunk);
                         }
                     },
                     onSuccess: (chunk) => {
@@ -464,14 +463,14 @@ const ChatPage = (props: ChatProps) => {
                         onAgentSuccess([aiMessage]);
                     },
                     onError: (error) => {
-                        console.log('onError', error);
+                        console.error('onError', error);
                         onAgentError(error);
                         setRequestLoading(false);
                     },
                 },
             )
         }
-    })
+    });
 
     const {onRequest, messages, setMessages} = useXChat({
         agent: agent,
@@ -603,7 +602,7 @@ const ChatPage = (props: ChatProps) => {
             ? messages.map((
                 {id, message, status}) =>
                 ({
-                    key: message.id,
+                    key: id || message.id || `msg-${Date.now()}-${Math.random()}`, // 确保 key 唯一
                     role: message.type,
                     header: (message.type === 'ai' && <MessageHeader message={message as AIAgentMessage}/>),
                     content: message.content,
@@ -624,8 +623,11 @@ const ChatPage = (props: ChatProps) => {
                     messageRender: message.type === 'ai' ?
                         ((content) => (<MarkdownRender content={content}/>)) : undefined,
                 }))
-            : [{ content: (<InitWelcome handleSubmit={handleSubmitMsg}/>),
-                variant: 'borderless' }];
+            : [{ 
+                key: 'welcome-message',
+                content: (<InitWelcome handleSubmit={handleSubmitMsg}/>),
+                variant: 'borderless' 
+            }];
         updateMessageItems(finalMessageItems);
     }, [messages]);
 
