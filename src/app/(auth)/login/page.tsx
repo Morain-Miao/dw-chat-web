@@ -59,10 +59,8 @@ const LoginPage = () => {
         console.log('user:', user);
         if (user) {
             messageApi.success('登录成功');
-            setTimeout(() => {
-                // window.location.href = '/';
-                router.push('/');
-            }, 5000);
+            // window.location.href = '/';
+            router.push('/');
             
         } else {
             messageApi.error('登录失败')
