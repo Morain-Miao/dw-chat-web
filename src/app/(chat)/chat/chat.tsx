@@ -460,7 +460,7 @@ const ChatPage = (props: ChatProps) => {
                     onSuccess: (chunk) => {
                         //console.log('onSuccess， chunk：', JSON.stringify(chunk));
                         //console.log('onSuccess， aiMessage：', JSON.stringify(aiMessage));
-                        onAgentSuccess([aiMessage]);
+                        onAgentSuccess(aiMessage);
                     },
                     onError: (error) => {
                         console.error('onError', error);
