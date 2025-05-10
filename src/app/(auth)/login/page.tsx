@@ -6,8 +6,6 @@ import {Space, Tabs, message, theme, Flex} from 'antd';
 import '@ant-design/v5-patch-for-react-19'; // 兼容 React19
 import {
     DingtalkOutlined,
-    GithubOutlined,
-    GoogleOutlined,
     LockOutlined,
     UserOutlined,
     WechatOutlined,
@@ -89,6 +87,15 @@ const LoginPage = () => {
         }
     }*/
 
+    // 处理图标点击
+    const handleIconClick = (type: string) => {
+        messageApi.info(`${type}登录功能暂未开放，敬请期待！`);
+    };
+
+    // 处理忘记密码点击
+    const handleForgotPassword = () => {
+        messageApi.info('请联系燕桥中学系统管理员重置密码！');
+    };
 
     return (
         <ProConfigProvider hashed={false}>
@@ -109,8 +116,14 @@ const LoginPage = () => {
                     actions={
                         <Space>
                             其他登录方式
-                            <WechatOutlined style={iconStyles}/>
-                            <DingtalkOutlined style={iconStyles}/>
+                            <WechatOutlined 
+                                style={iconStyles}
+                                onClick={() => handleIconClick('微信')}
+                            />
+                            <DingtalkOutlined 
+                                style={iconStyles}
+                                onClick={() => handleIconClick('钉钉')}
+                            />
                         </Space>
                     }
                     onFinish={handleLogin}
@@ -233,7 +246,10 @@ const LoginPage = () => {
                         <ProFormCheckbox noStyle name="autoLogin">
                             自动登录
                         </ProFormCheckbox>
-                        <a style={{float: 'right',}}>
+                        <a 
+                            style={{float: 'right',}}
+                            onClick={handleForgotPassword}
+                        >
                             忘记密码
                         </a>
                     </div>
