@@ -91,6 +91,8 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
             // 无论 API 是否成功，都执行清理操作
             // 先清除 cookie
             await cleanUserCookieAction()
+            // 清除自动登录信息
+            localStorage.removeItem('auto_login_info')
             // 再清除状态
             setUser(null)
             
@@ -104,6 +106,8 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
             console.error('Logout error:', error)
             // 即使 API 调用失败，也要确保清理本地状态
             await cleanUserCookieAction()
+            // 清除自动登录信息
+            localStorage.removeItem('auto_login_info')
             setUser(null)
             // 使用 window.location.href 替代 router.push
             window.location.href = '/login'

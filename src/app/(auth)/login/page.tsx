@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import type {CSSProperties} from 'react';
 import {Space, Tabs, message, theme, Flex} from 'antd';
 import '@ant-design/v5-patch-for-react-19'; // 兼容 React19
@@ -25,6 +25,13 @@ import {useAuth} from "@/components/provider/auth-provider";
 
 type LoginType = 'account' | 'email';
 
+const AUTO_LOGIN_KEY = 'auto_login_info';
+
+interface AutoLoginInfo {
+    username: string;
+    password: string;
+    timestamp: number;
+}
 
 /**
  * 登录页
@@ -35,6 +42,7 @@ const LoginPage = () => {
     const router = useRouter();
     const {login} = useAuth();
     const [loginType, setLoginType] = useState<LoginType>('account');
+    const [autoLogin, setAutoLogin] = useState(false);
 
     //const searchParams = useSearchParams();
     //const redirect = searchParams.get('redirect') || '/';
@@ -48,6 +56,35 @@ const LoginPage = () => {
         cursor: 'pointer',
     };
 
+    // 检查自动登录
+    useEffect(() => {
+        const checkAutoLogin = async () => {
+            const autoLoginInfo = localStorage.getItem(AUTO_LOGIN_KEY);
+            if (autoLoginInfo) {
+                try {
+                    const info: AutoLoginInfo = JSON.parse(autoLoginInfo);
+                    // 检查是否在7天内
+                    if (Date.now() - info.timestamp < 7 * 24 * 60 * 60 * 1000) {
+                        const user = await login(info.username, info.password);
+                        if (user) {
+                            messageApi.success('自动登录成功');
+                            router.push('/');
+                        } else {
+                            // 如果自动登录失败，清除保存的信息
+                            localStorage.removeItem(AUTO_LOGIN_KEY);
+                        }
+                    } else {
+                        // 如果超过7天，清除保存的信息
+                        localStorage.removeItem(AUTO_LOGIN_KEY);
+                    }
+                } catch (e) {
+                    console.error('自动登录失败:', e);
+                    localStorage.removeItem(AUTO_LOGIN_KEY);
+                }
+            }
+        };
+        checkAutoLogin();
+    }, []);
 
     // 执行登录操作
     const handleLogin = async (formData: Record<string, any>) => {
@@ -58,10 +95,21 @@ const LoginPage = () => {
         
         console.log('user:', user);
         if (user) {
+            // 如果选择了自动登录，保存登录信息
+            if (formData.autoLogin) {
+                const autoLoginInfo: AutoLoginInfo = {
+                    username,
+                    password,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(AUTO_LOGIN_KEY, JSON.stringify(autoLoginInfo));
+            } else {
+                // 如果没有选择自动登录，清除之前保存的信息
+                localStorage.removeItem(AUTO_LOGIN_KEY);
+            }
+
             messageApi.success('登录成功');
-            // window.location.href = '/';
             router.push('/');
-            
         } else {
             messageApi.error('登录失败')
             console.log('user is null')
@@ -243,7 +291,13 @@ const LoginPage = () => {
                         </>
                     )}
                     <div style={{marginBlockEnd: 24,}}>
-                        <ProFormCheckbox noStyle name="autoLogin">
+                        <ProFormCheckbox 
+                            noStyle 
+                            name="autoLogin"
+                            fieldProps={{
+                                onChange: (e) => setAutoLogin(e.target.checked)
+                            }}
+                        >
                             自动登录
                         </ProFormCheckbox>
                         <a 
