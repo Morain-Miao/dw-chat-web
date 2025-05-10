@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Button, Space} from "antd";
 import {Prompts, PromptsProps, Welcome} from "@ant-design/x";
 import {
@@ -11,7 +11,9 @@ import {
     SearchOutlined,
     ShareAltOutlined,
     SmileOutlined,
-    TagOutlined
+    TagOutlined,
+    LeftOutlined,
+    RightOutlined
 } from "@ant-design/icons";
 
 
@@ -101,11 +103,51 @@ type Props = {
     handleSubmit: (value: string) => void;
 }
 
+const STEPS_PER_PAGE = 3;
+
 /**
  * 初始态的欢迎语和提示词
  */
 const InitWelcome = (props: Props) => {
-    //const {styles} = useStyle();
+    const [stepPage, setStepPage] = useState(1);
+    const steps = promptItems[1].children || [];
+    const totalPages = Math.ceil(steps.length / STEPS_PER_PAGE);
+    const pagedSteps = steps.slice((stepPage - 1) * STEPS_PER_PAGE, stepPage * STEPS_PER_PAGE);
+
+    // 组装新的 promptItems，第二组 children 替换为分页后的内容
+    const pagedPromptItems = [
+        promptItems[0],
+        {
+            ...promptItems[1],
+            children: pagedSteps,
+            label: (
+                <Space align="center">
+                    {renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '完成一个批改作业任务')}
+                    <Button
+                        type="text"
+                        icon={<LeftOutlined />}
+                        size="small"
+                        style={{marginLeft: 8}}
+                        disabled={stepPage === 1}
+                        onClick={e => {
+                            e.stopPropagation();
+                            setStepPage(p => Math.max(1, p - 1));
+                        }}
+                    />
+                    <Button
+                        type="text"
+                        icon={<RightOutlined />}
+                        size="small"
+                        disabled={stepPage === totalPages}
+                        onClick={e => {
+                            e.stopPropagation();
+                            setStepPage(p => Math.min(totalPages, p + 1));
+                        }}
+                    />
+                </Space>
+            ),
+        }
+    ];
 
     return (
         <Space
@@ -129,7 +171,7 @@ const InitWelcome = (props: Props) => {
             {/* 提示词 */}
             <Prompts
                 title={'你想问什么?'}
-                items={promptItems}
+                items={pagedPromptItems}
                 wrap
                 styles={{
                     item: {
