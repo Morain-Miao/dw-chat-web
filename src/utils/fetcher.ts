@@ -13,13 +13,14 @@ import { redirect } from 'next/navigation';
  * @param options
  */
 export async function clientFetcher(url: string, options: RequestInit = {}): Promise<ApiResponse> {
-
-    let token: string = '' ;
+    let token: string = '';
     const userCookie = Cookies.get(COOKIE_USER);
     if (userCookie) {
         try {
             const user: User = JSON.parse(userCookie);
-            token = user.token
+            if (user && user.token) {
+                token = user.token;
+            }
         } catch (e) {
             console.error('Failed to parse user cookie.', e)
         }
@@ -65,12 +66,14 @@ export async function clientFetcher(url: string, options: RequestInit = {}): Pro
  * @param options
  */
 export async function clientCoreFetcher(url: string, options: RequestInit = {}): Promise<ApiResponse> {
-    let token: string = '' ;
+    let token: string = '';
     const userCookie = Cookies.get(COOKIE_USER);
     if (userCookie) {
         try {
             const user: User = JSON.parse(userCookie);
-            token = user.token
+            if (user && user.token) {
+                token = user.token;
+            }
         } catch (e) {
             console.error('Failed to parse user cookie.', e)
         }

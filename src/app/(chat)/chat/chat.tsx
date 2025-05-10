@@ -394,12 +394,15 @@ const ChatPage = (props: ChatProps) => {
     const xRequest = XRequest({
         baseURL: `${appConfig.apiStreamChatUrl}`,  // 使用相对路径，通过 Next.js 代理
         fetch: async (url, options) => {
+            const headers: any = {
+                ...options?.headers,
+            };
+            if (user?.token) {
+                headers["Authorization"] = `Bearer ${user.token}`;
+            }
             return fetch(url, {
                 ...options,
-                headers: {
-                    "Authorization": `Bearer ${user?.token || ''}`,
-                    ...options?.headers,
-                },
+                headers,
                 signal: abortControllerRef.current?.signal,
             })
         }

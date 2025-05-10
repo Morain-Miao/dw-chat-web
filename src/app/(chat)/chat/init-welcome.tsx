@@ -22,42 +22,42 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
 const promptItems: PromptsProps['items'] = [
     {
         key: '1',
-        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, 'Hot Topics'),
-        description: 'What are you interested in?',
+        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '热门问题'),
+        description: '你对什么感兴趣?',
         children: [
             {
                 key: '1-1',
-                description: `What's new in X?`,
+                description: `告诉我你有什么Tool功能`,
             },
             {
                 key: '1-2',
-                description: `What's AGI?`,
+                description: `如何创建学生档案？`,
             },
             {
                 key: '1-3',
-                description: `Where is the doc?`,
+                description: `查询初二五班的信息`,
             },
         ],
     },
     {
         key: '2',
-        label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, 'Design Guide'),
-        description: 'How to design a good product?',
+        label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '完成一个批改作业任务'),
+        description: '如何进行作业批改?',
         children: [
             {
                 key: '2-1',
                 icon: <HeartOutlined/>,
-                description: `Know the well`,
+                description: `第一步:上传作业原题、答案到附件`,
             },
             {
                 key: '2-2',
                 icon: <SmileOutlined/>,
-                description: `Set the AI role`,
+                description: `第二步:发布一个班级作业，并上传学生作业答案`,
             },
             {
                 key: '2-3',
                 icon: <CommentOutlined/>,
-                description: `Express the feeling`,
+                description: `第三步:告诉AI你想要批改哪个班级哪个学科的作业`,
             },
         ],
     }
@@ -84,8 +84,8 @@ const InitWelcome = (props: Props) => {
             <Welcome
                 variant="borderless"
                 icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                title="Hello, I'm Ant Design X"
-                description="Base on Ant Design, AGI product interface solution, create a better intelligent vision~"
+                title="您好,我是燕桥中学Ai智能助手,很高兴认识你!"
+                description="模型基于DeepSeek和阿里千问,可以回答你关于燕桥中学的任何问题,包括学生档案、作业批改、学生成绩等。"
                 extra={
                     <Space>
                         <Button icon={<ShareAltOutlined/>}/>
@@ -95,7 +95,7 @@ const InitWelcome = (props: Props) => {
             />
             {/* 提示词 */}
             <Prompts
-                title={'Do you want?'}
+                title={'你想问什么?'}
                 items={promptItems}
                 styles={{
                     list: {
