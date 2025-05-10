@@ -48,23 +48,50 @@ const promptItems: PromptsProps['items'] = [
     {
         key: '2',
         label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '完成一个批改作业任务'),
-        description: '如何进行作业批改?',
+        description: '如何进行作业批改?【共7步】',
         children: [
             {
                 key: '2-1',
                 icon: <TagOutlined />,
-                description: `第一步:上传作业原题、答案到附件`,
+                label: `第一步: 点击文件上传,上传作业原题、答案到附件`,
+                description: `请你帮我保存作业, 如果缺少信息请告诉我, 保存成功后告诉我返回的信息`,
             },
             {
                 key: '2-2',
                 icon: <TagOutlined />,
-                description: `第二步:发布一个班级作业，并上传学生作业答案`,
+                label: `第二步: 输入刚才返回的作业id,然后发布一个作业给某班级`,
+                description: `我要发布一个作业给某班级, 请告诉我如何发布作业`,
             },
             {
                 key: '2-3',
                 icon: <TagOutlined />,
-                description: `第三步:告诉AI你想要批改哪个班级哪个学科的作业`,
+                label: `第三步: 由学生自己或老师上传作业答题卡照片`,
+                description: `请告诉我如何提交作业, 需要哪些信息`,
             },
+            {
+                key: '2-4',
+                icon: <TagOutlined />,
+                label: `第四步: 告诉Ai自动批改哪个班级的作业`,
+                description: `请告诉我如何提交作业, 需要哪些信息`,
+            },
+            {
+                key: '2-5',
+                icon: <TagOutlined />,
+                label: `第五步: 告诉Ai自动批改哪个班级的作业`,
+                description: `请告诉我批改指定班级指定学科的作业?`,
+            },
+            {
+                key: '2-6',
+                icon: <TagOutlined />,
+                label: `第六步: 查询作业批改结果`,
+                description: `请告诉我如何查询作业批改结果, 需要提供哪些信息来查询`,
+            },
+            {
+                key: '2-7',
+                icon: <TagOutlined />,
+                label: `第七步: 人工批改作业`,
+                description: `请告诉我如何人工修改作业批改结果, 需要提供哪些信息`,
+            }
         ],
     }
 ];
