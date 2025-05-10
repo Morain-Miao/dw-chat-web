@@ -130,14 +130,19 @@ const InitWelcome = (props: Props) => {
             <Prompts
                 title={'你想问什么?'}
                 items={promptItems}
+                wrap
                 styles={{
-                    list: {
-                        width: '100%',
-                    },
                     item: {
-                        flex: 1,
-                    }
-                }}
+                      flex: 1,
+                      width: "100%",
+                      backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
+                      border: 0,
+                    },
+                    subItem: {
+                      background: "rgba(255,255,255,0.45)",
+                      border: "1px solid #FFF",
+                    },
+                  }}
                 onItemClick={({data}) => {
                     if (data.description) {
                         props.handleSubmit(data.description.toString())
