@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {AntdRegistry} from "@ant-design/nextjs-registry";
 import AppProvider from "@/components/provider/app-provider"; // 解决页面加载闪烁
+import { appConfig } from "@/utils/appConfig";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cambridge School Chat",
+  title: appConfig.appName,
   description: "Cambridge School App",
 };
 
