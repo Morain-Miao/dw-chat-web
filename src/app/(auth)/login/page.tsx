@@ -5,10 +5,12 @@ import type {CSSProperties} from 'react';
 import {Space, Tabs, message, theme, Flex} from 'antd';
 import '@ant-design/v5-patch-for-react-19'; // 兼容 React19
 import {
+    DingtalkOutlined,
     GithubOutlined,
     GoogleOutlined,
     LockOutlined,
     UserOutlined,
+    WechatOutlined,
 } from '@ant-design/icons';
 import {
     LoginForm,
@@ -107,8 +109,8 @@ const LoginPage = () => {
                     actions={
                         <Space>
                             其他登录方式
-                            <GithubOutlined style={iconStyles}/>
-                            <GoogleOutlined style={iconStyles}/>
+                            <WechatOutlined style={iconStyles}/>
+                            <DingtalkOutlined style={iconStyles}/>
                         </Space>
                     }
                     onFinish={handleLogin}

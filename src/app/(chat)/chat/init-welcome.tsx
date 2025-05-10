@@ -6,9 +6,12 @@ import {
     EllipsisOutlined,
     FireOutlined,
     HeartOutlined,
+    QuestionCircleOutlined,
     ReadOutlined,
+    SearchOutlined,
     ShareAltOutlined,
-    SmileOutlined
+    SmileOutlined,
+    TagOutlined
 } from "@ant-design/icons";
 
 
@@ -27,14 +30,17 @@ const promptItems: PromptsProps['items'] = [
         children: [
             {
                 key: '1-1',
+                icon: <SmileOutlined/>,
                 description: `告诉我你有什么Tool功能`,
             },
             {
                 key: '1-2',
+                icon: <QuestionCircleOutlined/>,
                 description: `如何创建学生档案？`,
             },
             {
                 key: '1-3',
+                icon: <SearchOutlined/>,
                 description: `查询初二五班的信息`,
             },
         ],
@@ -46,17 +52,17 @@ const promptItems: PromptsProps['items'] = [
         children: [
             {
                 key: '2-1',
-                icon: <HeartOutlined/>,
+                icon: <TagOutlined />,
                 description: `第一步:上传作业原题、答案到附件`,
             },
             {
                 key: '2-2',
-                icon: <SmileOutlined/>,
+                icon: <TagOutlined />,
                 description: `第二步:发布一个班级作业，并上传学生作业答案`,
             },
             {
                 key: '2-3',
-                icon: <CommentOutlined/>,
+                icon: <TagOutlined />,
                 description: `第三步:告诉AI你想要批改哪个班级哪个学科的作业`,
             },
         ],
