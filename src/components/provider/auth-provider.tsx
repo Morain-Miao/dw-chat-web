@@ -86,15 +86,29 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
         }, [])
 
     const logout = useCallback(async () => {
-        const resp = await logoutAPI()
-        if (resp.code == 200) {
-            setUser(null)
+        try {
+            const resp = await logoutAPI()
+            // 无论 API 是否成功，都执行清理操作
+            // 先清除 cookie
             await cleanUserCookieAction()
-        } else {
-            message.error(resp.message)
+            // 再清除状态
+            setUser(null)
+            
+            if (resp.code !== 200) {
+                message.error(resp.message)
+            }
+            
+            // 使用 window.location.href 替代 router.push
+            window.location.href = '/login'
+        } catch (error) {
+            console.error('Logout error:', error)
+            // 即使 API 调用失败，也要确保清理本地状态
+            await cleanUserCookieAction()
+            setUser(null)
+            // 使用 window.location.href 替代 router.push
+            window.location.href = '/login'
         }
-        router.push('/login')
-    }, [router]);
+    }, []);
 
     // 使用 useMemo 避免 value 对象引用变化
     const value = useMemo(() => ({

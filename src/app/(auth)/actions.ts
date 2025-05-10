@@ -68,7 +68,7 @@ export async function setUserCookieAction(user: User) {
  */
 export async function cleanUserCookieAction() {
     const cookie = await cookies();
-    cookie.delete(COOKIE_USER)
+    cookie.delete(COOKIE_USER);
     console.log('清除登录用户信息')
 }
 
@@ -79,13 +79,24 @@ export async function getUserCookieAction() {
     try {
         const cookie = await cookies();
         const userCookie = cookie.get(COOKIE_USER);
-        if (userCookie) {
-            const user: User = JSON.parse(userCookie.value);
-            console.log('获取登录用户信息')
-            return user
+        if (userCookie && userCookie.value) {
+            try {
+                const user: User = JSON.parse(userCookie.value);
+                // 验证必要的字段是否存在
+                if (user && user.userId && user.token) {
+                    console.log('获取登录用户信息成功')
+                    return user;
+                }
+            } catch (parseError) {
+                console.error('Cookie 解析失败:', parseError);
+                // 如果解析失败，清除可能损坏的 cookie
+                await cleanUserCookieAction();
+            }
         }
     } catch (e) {
-        console.log('Failed to getUserCookie.', e)
+        console.error('获取 Cookie 失败:', e);
+        // 发生错误时也清除 cookie
+        await cleanUserCookieAction();
     }
-    return null
+    return null;
 }
