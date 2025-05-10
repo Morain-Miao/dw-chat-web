@@ -75,18 +75,18 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
 
     // 使用 useCallback 避免函数引用变化
     const login = useCallback(async (username: string, password: string) => {
-            const resp = await loginAPI({username, password});
-            
-            if (resp.code === 200) {
-                const u: User = {username, token: resp.data.token, userId: resp.data.userId, expireTime: resp.data.expireTime, loginTime: resp.data.loginTime, ipaddr: resp.data.ipaddr}
-                setUser(u);
-                // 使用 cookies 存储登录信息
-                await setUserCookieAction(resp.data)
-                return u
-            } else {
-                setUser(null)
-            }
-        }, [])
+        const resp = await loginAPI({username, password});
+        if (resp.code === 200) {
+            const u: User = {username, token: resp.data.token, userId: resp.data.userId, expireTime: resp.data.expireTime, loginTime: resp.data.loginTime, ipaddr: resp.data.ipaddr}
+            setUser(u);
+            // 使用 cookies 存储登录信息（服务端+前端都 set 一遍）
+            await setUserCookieAction(resp.data);
+            Cookies.set('userCookie', JSON.stringify(u), { path: '/' }); // 前端再 set 一遍
+            return u;
+        } else {
+            setUser(null)
+        }
+    }, []);
 
     const logout = useCallback(async () => {
         try {

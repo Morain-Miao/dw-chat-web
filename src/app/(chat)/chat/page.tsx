@@ -1,19 +1,19 @@
-export const dynamic = 'force-dynamic'; // 声明为动态渲染, 防止构建时渲染为静态文件
+'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ChatPage from "@/app/(chat)/chat/chat";
-import {fetchInitChatList} from "@/app/(chat)/chat/chat-server";
+import { fetchInitChatList } from "@/app/(chat)/chat/chat-server";
+import { Conversation } from "@ant-design/x/es/conversations";
 
-const ChatHome = async () => {
-    console.debug('init ChatHome')
+const ChatHome = () => {
+    const [defaultConversationItems, setDefaultConversationItems] = useState<Conversation[]>([]);
 
-    const defaultConversationItems = await fetchInitChatList();
-    console.debug('defaultConversationItems:', defaultConversationItems);
+    useEffect(() => {
+        fetchInitChatList().then(setDefaultConversationItems);
+    }, []);
 
     return (
-         <ChatPage
-             defaultConversationItems={defaultConversationItems}
-         />
+        <ChatPage defaultConversationItems={defaultConversationItems} />
     );
 };
 
