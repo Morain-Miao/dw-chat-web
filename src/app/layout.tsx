@@ -4,6 +4,7 @@ import "./globals.css";
 import {AntdRegistry} from "@ant-design/nextjs-registry";
 import AppProvider from "@/components/provider/app-provider"; // 解决页面加载闪烁
 import { appConfig } from "@/utils/appConfig";
+import AuthProvider from "@/components/provider/auth-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body  className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
-      <AppProvider>
-        <AntdRegistry>
-          {children}
-        </AntdRegistry>
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <AntdRegistry>
+            {children}
+          </AntdRegistry>
+        </AppProvider>
+      </AuthProvider>
       </body>
     </html>
   );

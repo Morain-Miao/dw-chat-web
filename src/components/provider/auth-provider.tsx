@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import React, {
     createContext, ReactNode,
@@ -13,6 +13,7 @@ import {
 } from "@/app/(auth)/actions";
 import {loginAPI, logoutAPI} from "@/apis/user-api";
 import {message} from "antd";
+import Cookies from 'js-cookie';
 
 export interface User {
     userId: string;
@@ -53,21 +54,23 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
 
     // 仅在客户端加载时检查 cookie
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const user = await getUserCookieAction();
-                //console.log('AuthProvider useEffect Cookie:', JSON.stringify(user))
-                if (user) {
-                    setUser(user)
+        console.log('AuthProvider useEffect running');
+        if (typeof window !== 'undefined') {
+            const userCookie = Cookies.get('userCookie');
+            console.log('useEffect userCookie:', userCookie);
+            if (userCookie) {
+                try {
+                    const user = JSON.parse(userCookie);
+                    console.log('useEffect parsed user:', user);
+                    if (user && user.userId && user.token) {
+                        setUser(user);
+                    }
+                } catch (e) {
+                    setUser(null);
                 }
-            } catch (e) {
-                console.error('Failed to get user cookie', e);
-                setUser(null);
             }
-        };
-        fetchUser().then();
-
-        setLoading(false)
+            setLoading(false);
+        }
     }, []);
 
     // 使用 useCallback 避免函数引用变化
@@ -123,9 +126,11 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
         loading
     }), [user, login, logout, loading])
 
+    console.log('AuthProvider render, user:', user);
+
     return (
         <AuthContext.Provider value={value}>
-            {children}
+            {loading ? null : children}
         </AuthContext.Provider>
     );
 };

@@ -24,7 +24,7 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
     </Space>
 );
 
-const promptItems: PromptsProps['items'] = [
+export const promptItems: PromptsProps['items'] = [
     {
         key: '1',
         label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '热门问题'),

@@ -47,6 +47,8 @@ import HeaderActions from "@/app/(chat)/chat/header-actions";
 import {DeepSeekIcon, PanelLeftClose, PanelLeftOpen} from "@/components/Icons";
 import AvatarDropdown from "@/app/(chat)/chat/avatar-dropdown";
 import FileUpload from "@/app/(chat)/chat/file-upload";
+import FloatingWelcome from './FloatingWelcome';
+import { promptItems } from './init-welcome';
 
 // APIs
 import {
@@ -100,6 +102,8 @@ const ChatPage = (props: ChatProps) => {
     const [openReasoning, setOpenReasoning] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
     const [messageItems, updateMessageItems] = useImmer<BubbleDataType[]>([]);
+    const [showBubble, setShowBubble] = useState(false);
+    const [bubbleShown, setBubbleShown] = useState(false);
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -392,19 +396,28 @@ const ChatPage = (props: ChatProps) => {
 
     // 模型连接信息
     const xRequest = XRequest({
-        baseURL: `${appConfig.apiStreamChatUrl}`,  // 使用相对路径，通过 Next.js 代理
+        baseURL: `${appConfig.apiStreamChatUrl}`,
         fetch: async (url, options) => {
             const headers: any = {
                 ...options?.headers,
             };
+            console.log('fetch前 user:', user);
+            console.log('fetch前 user.token:', user?.token);
             if (user?.token) {
                 headers["Authorization"] = `Bearer ${user.token}`;
+            } else {
+                console.warn('未获取到有效 token，当前 user:', user);
             }
-            return fetch(url, {
+            console.log('fetch headers:', headers);
+            const resp = await fetch(url, {
                 ...options,
                 headers,
                 signal: abortControllerRef.current?.signal,
-            })
+            });
+            // 可选：打印响应
+            // const respText = await resp.clone().text();
+            // console.log('fetch response:', respText);
+            return resp;
         }
     });
 
@@ -438,20 +451,20 @@ const ChatPage = (props: ChatProps) => {
                             setRequestLoading(false);
                             //console.log('onUpdate', JSON.stringify(chunk));
                             // @ts-ignore
-                            const data: MessageVO = JSON.parse(chunk.data);
-
-                            aiMessage.id = data.msgId
-                            aiMessage.chatId = data.chatId
-
-                            const reasoning_content: string = data.reasoningContent || ''
-                            const resp_content: any = data.content || ''
-                            // 思考中
-                            if (reasoning_content) {
-                                aiMessage.reasoningContent += reasoning_content;
-                            }
-                            // 回答
-                            if (resp_content) {
-                                aiMessage.content += resp_content;
+                            const data: MessageVO | null = JSON.parse(chunk.data);
+                            if (data && typeof data === 'object') {
+                                aiMessage.id = data.msgId;
+                                aiMessage.chatId = data.chatId;
+                                const reasoning_content: string = data.reasoningContent || '';
+                                const resp_content: any = data.content || '';
+                                // 思考中
+                                if (reasoning_content) {
+                                    aiMessage.reasoningContent += reasoning_content;
+                                }
+                                // 回答
+                                if (resp_content) {
+                                    aiMessage.content += resp_content;
+                                }
                             }
                             //console.log('onAgentUpdate， aiMessage：', JSON.stringify(aiMessage));
                             onAgentUpdate(aiMessage);
@@ -673,8 +686,6 @@ const ChatPage = (props: ChatProps) => {
         if (!activeConversationKey) {
             chatId = await addConversation(msg);
         }
-
-        // 延时一会发起提问
         setTimeout(() => {
             onRequest({
                 type: 'user',
@@ -684,9 +695,13 @@ const ChatPage = (props: ChatProps) => {
                 openReasoning: openReasoning,
                 openSearch: openSearch,
             });
-        }, 500)
-
-    }
+        }, 500);
+        // 只在第一次触发时弹出气泡
+        if (!bubbleShown) {
+            setShowBubble(true);
+            setBubbleShown(true);
+        }
+    };
 
     /* 自定义发送框底部 */
     const senderFooter = ({components}: any) => {
@@ -774,20 +789,19 @@ const ChatPage = (props: ChatProps) => {
             <ProLayout
                 className='h-lvh'
                 token={proLayoutToken}
-                pure={false} // 是否删除自带页面
+                pure={false}
                 navTheme={'light'}
                 layout={'side'}
                 siderWidth={250}
                 logo={<Logo/>}
                 title={appConfig.appName}
-                menuHeaderRender={menuHeaderRender} // Logo Title
-                menuExtraRender={addConversationRender} // 开启新对话按钮
-                menuContentRender={conversationRender} // 会话管理
+                menuHeaderRender={menuHeaderRender}
+                menuExtraRender={addConversationRender}
+                menuContentRender={conversationRender}
                 actionsRender={actionsRender}
-                avatarProps={avatarRender} // 用户头像
-                footerRender={() => (<Footer/>)}  // 页脚
-
-                collapsedButtonRender={false} // 去掉默认侧边栏
+                avatarProps={avatarRender}
+                footerRender={() => (<Footer/>)}
+                collapsedButtonRender={false}
                 collapsed={collapsed}
                 onCollapse={setCollapsed}
             >
@@ -795,38 +809,43 @@ const ChatPage = (props: ChatProps) => {
                     {SidebarTrigger}
                 </div>
 
+                {/* 悬浮欢迎页组件 */}
+                <FloatingWelcome
+                    promptItems={promptItems}
+                    handleSubmit={handleSubmitMsg}
+                    showBubble={showBubble}
+                    onBubbleHide={() => setShowBubble(false)}
+                />
+
                 <Flex
                     vertical
                     gap={'large'}
                     className='w-full'
                     style={{margin: '0px auto', height: '94.5vh'}}
                 >
-                    {/* 消息列表 */}
                     <div className='h-full w-full px-1 overflow-y-auto scrollbar-container'>
                         <Bubble.List
                             className='max-w-2xl  mx-auto'
                             items={messageItems}
                         />
                     </div>
-
-                        {/* 输入框 */}
-                        <Sender
-                            className='max-w-2xl mx-auto'
-                            style={{marginTop: 'auto', borderRadius: '20px'}}
-                            autoSize={{minRows: 2, maxRows: 8}}
-                            placeholder='请输入你的问题...'
-                            loading={agent.isRequesting()}
-                            value={inputTxt}
-                            onChange={setInputTxt}
-                            onSubmit={handleSubmitMsg}
-                            onCancel={handleCancel}
-                            actions={false}
-                            footer={senderFooter}
-                        />
+                    <Sender
+                        className='max-w-2xl mx-auto'
+                        style={{marginTop: 'auto', borderRadius: '20px'}}
+                        autoSize={{minRows: 2, maxRows: 8}}
+                        placeholder='请输入你的问题...'
+                        loading={agent.isRequesting()}
+                        value={inputTxt}
+                        onChange={setInputTxt}
+                        onSubmit={handleSubmitMsg}
+                        onCancel={handleCancel}
+                        actions={false}
+                        footer={senderFooter}
+                    />
                 </Flex>
             </ProLayout>
         </XProvider>
-);
+    );
 };
 
 export default ChatPage;
