@@ -48,18 +48,34 @@ export async function loginAction(username: string, password: string) {
  * @param token
  */
 export async function setUserCookieAction(user: User) {
-    const cookie = await cookies();
-    cookie.set(COOKIE_USER,
-        JSON.stringify(user),
-        {
-            path: '/',
-            httpOnly: false, // ❗必须为 false，客户端才能读取
-            //secure: process.env.NODE_ENV === 'production', // 设置了 secure: true，只能在 https 环境下  Cookies.get 到 Cookie。
-            //sameSite: 'strict', // 设置了 sameSite: 'strict'，请求是从同一站点发起的，才能 Cookies.get 到 Cookie。
-            maxAge: 60 * 60 * 24 * 7 // 7 days
+    try {
+        const cookie = await cookies();
+        const userJson = JSON.stringify(user);
+        console.log('Setting user cookie:', userJson);
+        
+        cookie.set(COOKIE_USER,
+            userJson,
+            {
+                path: '/',
+                httpOnly: false, // ❗必须为 false，客户端才能读取
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                sameSite: 'lax' // 添加 sameSite 属性以提高安全性
+            }
+        );
+        
+        // 验证 cookie 是否设置成功
+        const setCookie = cookie.get(COOKIE_USER);
+        if (!setCookie) {
+            console.error('Failed to set user cookie');
+            return false;
         }
-    );
-    console.log('储存登录用户信息')
+        
+        console.log('Successfully set user cookie');
+        return true;
+    } catch (error) {
+        console.error('Error setting user cookie:', error);
+        return false;
+    }
 }
 
 

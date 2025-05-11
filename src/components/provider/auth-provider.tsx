@@ -14,6 +14,7 @@ import {
 import {loginAPI, logoutAPI} from "@/apis/user-api";
 import {message} from "antd";
 import Cookies from 'js-cookie';
+import {COOKIE_USER} from "@/utils/constant";
 
 export interface User {
     userId: string;
@@ -56,7 +57,7 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
     useEffect(() => {
         console.log('AuthProvider useEffect running');
         if (typeof window !== 'undefined') {
-            const userCookie = Cookies.get('userCookie');
+            const userCookie = Cookies.get(COOKIE_USER);
             console.log('useEffect userCookie:', userCookie);
             if (userCookie) {
                 try {
@@ -64,10 +65,17 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
                     console.log('useEffect parsed user:', user);
                     if (user && user.userId && user.token) {
                         setUser(user);
+                    } else {
+                        console.warn('Invalid user data in cookie:', user);
+                        setUser(null);
                     }
                 } catch (e) {
+                    console.error('Failed to parse user cookie:', e);
                     setUser(null);
                 }
+            } else {
+                console.log('No user cookie found');
+                setUser(null);
             }
             setLoading(false);
         }
@@ -75,16 +83,44 @@ const AuthProvider = ({children}: { children: ReactNode }) => {
 
     // 使用 useCallback 避免函数引用变化
     const login = useCallback(async (username: string, password: string) => {
-        const resp = await loginAPI({username, password});
-        if (resp.code === 200) {
-            const u: User = {username, token: resp.data.token, userId: resp.data.userId, expireTime: resp.data.expireTime, loginTime: resp.data.loginTime, ipaddr: resp.data.ipaddr}
-            setUser(u);
-            // 使用 cookies 存储登录信息（服务端+前端都 set 一遍）
-            await setUserCookieAction(resp.data);
-            Cookies.set('userCookie', JSON.stringify(u), { path: '/' }); // 前端再 set 一遍
-            return u;
-        } else {
-            setUser(null)
+        try {
+            const resp = await loginAPI({username, password});
+            if (resp.code === 200) {
+                const u: User = {
+                    username,
+                    token: resp.data.token,
+                    userId: resp.data.userId,
+                    expireTime: resp.data.expireTime,
+                    loginTime: resp.data.loginTime,
+                    ipaddr: resp.data.ipaddr
+                };
+                
+                // 先设置服务端 cookie
+                const cookieSet = await setUserCookieAction(u);
+                if (!cookieSet) {
+                    console.error('Failed to set server cookie');
+                    setUser(null);
+                    return undefined;
+                }
+                
+                // 再设置客户端 cookie
+                Cookies.set(COOKIE_USER, JSON.stringify(u), {
+                    path: '/',
+                    expires: new Date(u.expireTime),
+                    sameSite: 'lax'
+                });
+                
+                setUser(u);
+                return u;
+            } else {
+                console.error('Login failed:', resp.message);
+                setUser(null);
+                return undefined;
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setUser(null);
+            return undefined;
         }
     }, []);
 

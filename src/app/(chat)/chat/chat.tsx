@@ -656,6 +656,11 @@ const ChatPage = (props: ChatProps) => {
             return
         }
         const resp = await queryMessageListAPI(conversationKey)
+        if (!resp.data) {
+            console.warn('No message data received for conversation:', conversationKey);
+            setMessages([]);
+            return;
+        }
         // @ts-ignore
         const msgs: MessageInfo<AgentMessage>[] = resp.data.map((item) => ({
             id: item.msgId,
