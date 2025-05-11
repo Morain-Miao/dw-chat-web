@@ -33,16 +33,19 @@ export const promptItems: PromptsProps['items'] = [
             {
                 key: '1-1',
                 icon: <SmileOutlined/>,
-                description: `告诉我你有什么Tool功能`,
+                label: `了解燕桥中学Ai的本地化功能`,
+                description: `请列出你有什么Tool功能`,
             },
             {
                 key: '1-2',
                 icon: <QuestionCircleOutlined/>,
+                label: `让Ai帮助你创建学生信息`,
                 description: `如何创建学生档案？`,
             },
             {
                 key: '1-3',
                 icon: <SearchOutlined/>,
+                label: `你的第一个查询类型对话`,
                 description: `查询初二五班的信息`,
             },
         ],
