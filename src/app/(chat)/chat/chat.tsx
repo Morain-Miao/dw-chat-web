@@ -107,6 +107,14 @@ const ChatPage = (props: ChatProps) => {
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
+    // 初始化加载历史消息
+    useEffect(() => {
+        const initData = async () => {
+            // 初始化会话列表
+            await initConversations();
+        };
+        initData();
+    }, []);
 
     // 主题配置
     const customTheme: ThemeConfig = {

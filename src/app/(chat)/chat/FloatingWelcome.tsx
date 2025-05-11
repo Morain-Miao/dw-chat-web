@@ -23,13 +23,15 @@ const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
 
   // 监听 showBubble prop 变化
   useEffect(() => {
-    setBubbleVisible(showBubble);
     if (showBubble) {
+      setBubbleVisible(true);
       const timer = setTimeout(() => {
         setBubbleVisible(false);
         onBubbleHide();
       }, 5000);
       return () => clearTimeout(timer);
+    } else {
+      setBubbleVisible(false);
     }
   }, [showBubble, onBubbleHide]);
 
@@ -59,7 +61,7 @@ const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
             style={{ fontSize: 20 }}
           />
         </div>
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
           <Welcome
             variant="borderless"
             icon={WELCOME_ICON}
@@ -155,7 +157,7 @@ const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
             0% { opacity: 0; }
             10% { opacity: 1; }
             90% { opacity: 1; }
-            100% { opacity: 0; display: none; }
+            100% { opacity: 0; }
           }
         `}
       </style>
