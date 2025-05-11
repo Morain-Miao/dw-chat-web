@@ -87,7 +87,6 @@ type ChatProps = {
 }
 
 const ChatPage = (props: ChatProps) => {
-    console.log('init ChatPage')
     // Hooks and state initialization
     const [messageApi, contextHolder] = message.useMessage();
     const {token} = theme.useToken();
@@ -656,8 +655,6 @@ const ChatPage = (props: ChatProps) => {
                 content: (<InitWelcome handleSubmit={handleSubmitMsg}/>),
                 variant: 'borderless' 
             }];
-        // 打印最终渲染的 messageItems
-        console.log('最终渲染的 messageItems:', finalMessageItems);
         updateMessageItems(finalMessageItems);
     }, [messages]);
 
