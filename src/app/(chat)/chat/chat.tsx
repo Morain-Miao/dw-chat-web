@@ -632,23 +632,23 @@ const ChatPage = (props: ChatProps) => {
                 ({
                     key: id || message.id || `msg-${Date.now()}-${Math.random()}`, // 确保 key 唯一
                     role: message.type,
-                    header: (message.type === 'ai' && <MessageHeader message={message as AIAgentMessage}/>),
+                    header: (message.type?.toLowerCase() === 'ai' && <MessageHeader message={message as AIAgentMessage}/>),
                     content: message.content,
-                    footer: ((!agent.isRequesting() && message.type === 'ai') &&
+                    footer: ((!agent.isRequesting() && message.type?.toLowerCase() === 'ai') &&
                         <MessageFooter message={message as AIAgentMessage}/>
                     ),
                     loading: status === 'loading' && requestLoading,
-                    placement: message.type === 'ai' ? 'start' : 'end',
-                    variant: message.type === 'ai' ? (message.content ? 'outlined' : 'borderless') : undefined,
-                    avatar: message.type === 'ai' ?
+                    placement: message.type?.toLowerCase() === 'ai' ? 'start' : 'end',
+                    variant: message.type?.toLowerCase() === 'ai' ? (message.content ? 'outlined' : 'borderless') : undefined,
+                    avatar: message.type?.toLowerCase() === 'ai' ?
                         {
                             icon: <DeepSeekIcon/>,
                             style: {border: '1px solid #c5eaee', backgroundColor: 'white'}
                         } : undefined,
-                    typing: message.type === 'ai' && message.loading ?
+                    typing: message.type?.toLowerCase() === 'ai' && 'loading' in message && message.loading ?
                         {step: 5, interval: 50} : undefined,
-                    style: message.type === 'ai' ? {maxWidth: 700} : undefined,
-                    messageRender: message.type === 'ai' ?
+                    style: message.type?.toLowerCase() === 'ai' ? {maxWidth: 700} : undefined,
+                    messageRender: message.type?.toLowerCase() === 'ai' ?
                         ((content) => (<MarkdownRender content={content}/>)) : undefined,
                 }))
             : [{ 
@@ -656,6 +656,8 @@ const ChatPage = (props: ChatProps) => {
                 content: (<InitWelcome handleSubmit={handleSubmitMsg}/>),
                 variant: 'borderless' 
             }];
+        // 打印最终渲染的 messageItems
+        console.log('最终渲染的 messageItems:', finalMessageItems);
         updateMessageItems(finalMessageItems);
     }, [messages]);
 
