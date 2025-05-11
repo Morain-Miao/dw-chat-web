@@ -203,7 +203,10 @@ const ChatPage = (props: ChatProps) => {
                         }}
                         type='link'
                         icon={<PlusOutlined/>}
-                        onClick={clickAddConversation}
+                        onClick={() => {
+                            console.log('点击了开启新对话（收起状态）');
+                            clickAddConversation();
+                        }}
                     />
                 </Tooltip>
                 :
@@ -218,7 +221,10 @@ const ChatPage = (props: ChatProps) => {
                     }}
                     type={'link'}
                     icon={<PlusOutlined/>}
-                    onClick={clickAddConversation}
+                    onClick={() => {
+                        console.log('点击了开启新对话（展开状态）');
+                        clickAddConversation();
+                    }}
                 >
                     开启新对话
                 </Button>
@@ -228,26 +234,29 @@ const ChatPage = (props: ChatProps) => {
 
     // 点击添加会话
     const clickAddConversation = () => {
-        setActiveConversationKey('')
-        setMessages([])
+        addConversation(''); // 新建空白对话
+        setMessages([]);
     }
 
     // 添加会话
     const addConversation = async (msg: string) => {
-        if (msg) {
-            let chatId: string = ''
-            const chatName = msg.length > 10 ? msg.substring(0, 10) : msg
-
-            const resp = await saveChatAPI({
-                chatId,
-                chatName,
-                userId: getCurrentUserId()
-            })
-            if (resp.code === 200) {
-                // 初始化会话记录列表
-                await initConversations()
-                return resp.data;
+        let chatId: string = ''
+        let chatName = msg && msg.length > 0 ? (msg.length > 10 ? msg.substring(0, 10) : msg) : '空白对话';
+        const resp = await saveChatAPI({
+            chatId,
+            chatName,
+            userId: getCurrentUserId()
+        })
+        console.log('saveChatAPI 返回:', resp);
+        if (resp.code === 200) {
+            // 初始化会话记录列表
+            await initConversations()
+            // 自动选中新建的会话
+            if (resp.data) {
+                console.log('新建会话 chatId:', resp.data);
+                setActiveConversationKey(resp.data);
             }
+            return resp.data;
         }
     };
 
@@ -259,6 +268,7 @@ const ChatPage = (props: ChatProps) => {
         const resp = await queryChatPageAPI({
             pageNum: 1, pageSize: 100, chatName: ''
         })
+        console.log('queryChatPageAPI 返回:', resp);
         if (resp.data) {
             const initConversationItems: Conversation[] = resp.data.list.map((item) => {
                 return {
@@ -267,8 +277,8 @@ const ChatPage = (props: ChatProps) => {
                     createTime: item.createTime,
                 }
             });
+            console.log('setConversationsItems:', initConversationItems);
             setConversationsItems(initConversationItems)
-
             if (initConversationItems.length > 0) {
                 handleSelectedConversation(initConversationItems[0].key)
             }
@@ -737,6 +747,12 @@ const ChatPage = (props: ChatProps) => {
         let chatId: string | undefined = '';
         if (!activeConversationKey) {
             chatId = await addConversation(msg);
+        }
+        // 自动更新空白对话标题
+        const currentConversation = (conversationsItems || []).find(item => item.key === (chatId ? chatId : activeConversationKey));
+        if (currentConversation && currentConversation.label === '空白对话') {
+            const newLabel = msg.length > 10 ? msg.substring(0, 10) : msg;
+            await saveConversation(currentConversation.key, newLabel);
         }
         setTimeout(() => {
             onRequest({
