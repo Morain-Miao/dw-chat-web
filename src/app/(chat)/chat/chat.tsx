@@ -689,7 +689,6 @@ const ChatPage = (props: ChatProps) => {
     }
 
     useEffect(() => {
-        console.log('activeConversationKey:', activeConversationKey)
         queryMessageList(activeConversationKey).then()
     }, [activeConversationKey]);
 
