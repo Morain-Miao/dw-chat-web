@@ -71,6 +71,9 @@ import type {ProLayoutProps} from "@ant-design/pro-components";
 import dynamic from 'next/dynamic';
 import { COOKIE_USER } from '@/utils/constant';
 import { getCurrentUserId } from '@/utils/IdUtil';
+import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
+dayjs.extend(isoWeek);
 
 
 // 动态导入
@@ -261,6 +264,7 @@ const ChatPage = (props: ChatProps) => {
                 return {
                     key: item.chatId,
                     label: item.chatName,
+                    createTime: item.createTime,
                 }
             });
             setConversationsItems(initConversationItems)
@@ -371,21 +375,54 @@ const ChatPage = (props: ChatProps) => {
         },
     });
 
+    // 会话分组函数
+    function groupConversationsByTime(items: Conversation[]) {
+        const now = dayjs();
+        // 以本自然周周一为一周的开始
+        const startOfWeek = now.startOf('isoWeek');
+        const groups: { [key: string]: Conversation[] } = { '本周': [], '更早': [] };
+        items.forEach(item => {
+            // 使用 createTime 字段
+            // @ts-ignore
+            const createTime = item.createTime ? dayjs(item.createTime) : null;
+            if (createTime && createTime.isAfter(startOfWeek)) {
+                groups['本周'].push(item);
+            } else {
+                groups['更早'].push(item);
+            }
+        });
+        return groups;
+    }
+
     // 会话管理列表
     const conversationRender = (props: SiderMenuProps, defaultDom: React.ReactNode) => {
-        return <>
-            {!props.collapsed &&
-                <div className='h-full px-1 overflow-y-auto scrollbar-container'>
-                    <Conversations
-                        items={conversationsItems}
-                        menu={menuConfig}
-                        activeKey={activeConversationKey}
-                        onActiveChange={setActiveConversationKey}
-                    />
-                </div>
-
-            }
-        </>
+        if (props.collapsed) return null;
+        // 分组
+        const groups = groupConversationsByTime(conversationsItems || []);
+        return (
+            <div className='h-full px-1 overflow-y-auto scrollbar-container'>
+                {Object.entries(groups).map(([group, items]) => (
+                    items.length > 0 && (
+                        <div key={group} style={{marginBottom: 16}}>
+                            <div style={{
+                                fontWeight: 'bold',
+                                color: '#b0b0b0',
+                                fontSize: 14,
+                                margin: '12px 0 6px 8px',
+                                borderBottom: '1px solid #eee',
+                                paddingBottom: 2
+                            }}>{group}</div>
+                            <Conversations
+                                items={items}
+                                menu={menuConfig}
+                                activeKey={activeConversationKey}
+                                onActiveChange={setActiveConversationKey}
+                            />
+                        </div>
+                    )
+                ))}
+            </div>
+        );
     }
 
     // actionsRender
