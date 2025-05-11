@@ -150,6 +150,10 @@ const ChatPage = (props: ChatProps) => {
 
     // 处理 logo 和标题文字的样式
     const menuHeaderRender = (logo: React.ReactNode, title: React.ReactNode, props?: SiderMenuProps) => {
+        // 只显示 logo，不显示文字
+        if (props?.collapsed) {
+            return <Flex align='center'>{logo}</Flex>;
+        }
         return (
             <Flex align='center'>
                 {logo}
