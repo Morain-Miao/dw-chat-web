@@ -33,6 +33,5 @@ export async function POST(request: NextRequest) {
         console.log('Failed to queryChatPage.', resp.status)
     }
     const apiResponse: ApiResponse<PageResult<ChatRecordVO>> = await resp.json();
-    console.log('api/chat response:', JSON.stringify(apiResponse));
     return NextResponse.json(apiResponse)
 }

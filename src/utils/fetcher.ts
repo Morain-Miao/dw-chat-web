@@ -25,7 +25,6 @@ export async function clientFetcher(url: string, options: RequestInit = {}): Pro
             console.error('Failed to parse user cookie.', e)
         }
     }
-    console.log('client get token :', token)
     if (!token) {
         window.location.href = '/login';
         return Promise.reject(new Error('Unauthorized')); // 显式拒绝，防止继续处理
@@ -78,7 +77,6 @@ export async function clientCoreFetcher(url: string, options: RequestInit = {}):
             console.error('Failed to parse user cookie.', e)
         }
     }
-    console.log('client get token :', token)
 
     // 只有有 token 时才加 Authorization
     const headers: any = {
