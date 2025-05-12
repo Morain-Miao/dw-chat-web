@@ -841,9 +841,21 @@ const ChatPage = (props: ChatProps) => {
 
     // 停止
     const handleCancel = () => {
-        setRequestLoading(false);
-        abortControllerRef.current?.abort('手动停止');
-        messageApi.error('已停止')
+        try {
+            setRequestLoading(false);
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort('用户手动停止');
+                // 清理当前的 AbortController
+                abortControllerRef.current = null;
+            }
+            messageApi.info('已停止对话');
+        } catch (error: any) {
+            // 忽略 AbortError，因为这是预期的行为
+            if (error.name !== 'AbortError') {
+                console.error('停止对话时发生错误:', error);
+                messageApi.error('停止对话时发生错误');
+            }
+        }
     }
 
     // 通过 useEffect 清理函数自动取消未完成的请求：
@@ -851,7 +863,14 @@ const ChatPage = (props: ChatProps) => {
         const controller = new AbortController();
         abortControllerRef.current = controller;
         return () => {
-            controller.abort('组件卸载，取消请求');
+            try {
+                if (controller) {
+                    controller.abort('组件卸载，取消请求');
+                }
+            } catch (error: any) {
+                // 忽略清理阶段的错误
+                console.debug('清理阶段取消请求:', error);
+            }
         };
     }, []);
 
