@@ -108,6 +108,7 @@ const ChatPage = (props: ChatProps) => {
     const [messageItems, updateMessageItems] = useImmer<BubbleDataType[]>([]);
     const [showBubble, setShowBubble] = useState(false);
     const [bubbleShown, setBubbleShown] = useState(false);
+    const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: number, name: string }>>([]);
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -765,6 +766,7 @@ const ChatPage = (props: ChatProps) => {
                 content: msg,
                 openReasoning: openReasoning,
                 openSearch: openSearch,
+                fileIds: uploadedFiles.map(file => file.id),
             });
         }, 500);
         // 只在第一次触发时弹出气泡
@@ -812,10 +814,12 @@ const ChatPage = (props: ChatProps) => {
                 </Flex>
 
                 <Flex gap='small'>
-                    <FileUpload onUploadSuccess={(files) => {
-                        // 处理上传成功的文件
-                        console.log('上传的文件:', files);
-                        // 这里可以添加文件处理逻辑
+                    <FileUpload onUploadSuccess={(filesInfo) => {
+                        if (Array.isArray(filesInfo)) {
+                            setUploadedFiles(prev => [...prev, ...filesInfo]);
+                        } else {
+                            setUploadedFiles(prev => [...prev, filesInfo]);
+                        }
                     }} />
                     {
                         !agent.isRequesting() ?
