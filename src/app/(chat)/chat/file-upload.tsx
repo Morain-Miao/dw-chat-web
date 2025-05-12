@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Button, message, Upload, Modal } from 'antd';
 import { PaperClipOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadFileStatus } from 'antd/es/upload/interface';
-import { uploadFilesBatchAPI } from '@/apis/chat-api';
-import { getCurrentUserId } from '@/utils/IdUtil';
+import type { UploadFile } from 'antd/es/upload/interface';
 import { uploadFilesBatchAPI } from '@/apis/chat-api';
 import { getCurrentUserId } from '@/utils/IdUtil';
 
@@ -15,7 +13,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
     const [open, setOpen] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploading, setUploading] = useState(false);
-    const [messageApi, contextHolder] = message.useMessage();
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleUpload = async () => {
@@ -47,7 +44,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
             }
         } catch (error) {
             messageApi.error('上传失败，请重试！');
-            messageApi.error('上传失败，请重试！');
         } finally {
             setUploading(false);
         }
@@ -65,16 +61,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
             const uploadFile: UploadFile = {
                 uid: rcFile.uid || Date.now().toString() + Math.random().toString(36).slice(2),
                 name: rcFile.name,
-                status: 'done',
-                originFileObj: rcFile,
-            };
-            setFileList(prev => [...prev, uploadFile]);
-        beforeUpload: (file: File) => {
-            const rcFile = file as any; // 断言为 RcFile 以兼容 UploadFile
-            const uploadFile: UploadFile = {
-                uid: rcFile.uid || Date.now().toString() + Math.random().toString(36).slice(2),
-                name: rcFile.name,
-                status: 'done',
+                status: 'done' as const,
                 originFileObj: rcFile,
             };
             setFileList(prev => [...prev, uploadFile]);
@@ -85,7 +72,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
 
     return (
         <>
-            {contextHolder}
             {contextHolder}
             <Button
                 type="text"
