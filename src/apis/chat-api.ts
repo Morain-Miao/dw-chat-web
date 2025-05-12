@@ -36,6 +36,7 @@ export interface StreamChatParam {
     modelId?: string;
     openReasoning?: boolean;
     openSearch?: boolean;
+    fileIds?: number[];
 }
 
 /**
@@ -59,6 +60,7 @@ export type UserAgentMessage = {
     chatId?: string;
     openReasoning?: boolean;
     openSearch?: boolean;
+    fileIds?: number[];
 };
 
 export type AIAgentMessage = {
@@ -169,16 +171,14 @@ export const  saveVoteAPI = async (param: VoteParam) => {
 }
 
 // 文件上传API
-export const uploadFileAPI = async (file: File): Promise<ApiResponse<UploadFileVO>> => {
+export const uploadFileAPI = async (file: File): Promise<ApiResponse<number>> => {
     const formData = new FormData();
     formData.append('file', file);
     
     return await clientFetcher('/chat/upload', {
         method: 'POST',
         body: formData,
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
+        // 不要设置 Content-Type，浏览器会自动处理 multipart/form-data
     });
 };
 
@@ -187,7 +187,7 @@ export const uploadFilesBatchAPI = async (
   files: File[],
   userId: string,
   expireHours?: number
-): Promise<ApiResponse<boolean>> => {
+): Promise<ApiResponse<number[]>> => {
   const formData = new FormData();
   files.forEach(file => formData.append('files', file));
   formData.append('userId', userId);
@@ -195,7 +195,7 @@ export const uploadFilesBatchAPI = async (
     formData.append('expireHours', expireHours.toString());
   }
 
-  return await clientFetcher('/api/v1/files/upload/batch', {
+  return await clientFetcher('/files/upload/batch', {
     method: 'POST',
     body: formData,
     // 不要设置 Content-Type，浏览器会自动处理 multipart/form-data

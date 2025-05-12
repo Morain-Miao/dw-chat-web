@@ -30,13 +30,18 @@ export async function clientFetcher(url: string, options: RequestInit = {}): Pro
         return Promise.reject(new Error('Unauthorized')); // 显式拒绝，防止继续处理
     }
 
+    // 修正：仅当 body 不是 FormData 时设置 Content-Type
+    const headers: any = {
+        "Authorization": `Bearer ${token}`,
+        ...options.headers
+    };
+    if (!(options.body instanceof FormData)) {
+        headers["Content-Type"] = "application/json";
+    }
+
     const res = await fetch(`${appConfig.apiBaseUrl}${url}`, {
         ...options,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-            ...options.headers
-        },
+        headers,
     });
 
     if (res.status === 401) {

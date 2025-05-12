@@ -60,7 +60,9 @@ import {
     queryMessageListAPI,
     saveChatAPI,
     saveVoteAPI,
-    StreamChatParam
+    StreamChatParam,
+    uploadFileAPI,
+    uploadFilesBatchAPI
 } from "@/apis/chat-api";
 
 // Utils & Providers
@@ -106,6 +108,7 @@ const ChatPage = (props: ChatProps) => {
     const [messageItems, updateMessageItems] = useImmer<BubbleDataType[]>([]);
     const [showBubble, setShowBubble] = useState(false);
     const [bubbleShown, setBubbleShown] = useState(false);
+    const [uploadedFileIds, setUploadedFileIds] = useState<number[]>([]);
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -502,6 +505,7 @@ const ChatPage = (props: ChatProps) => {
                     openReasoning: message?.openReasoning,
                     openSearch: message?.openSearch,
                     userId: getCurrentUserId(),
+                    ...(message?.type === 'user' && (message as any)?.fileIds ? { fileIds: (message as any).fileIds } : {}),
                 },
                 {
                     onUpdate: (chunk) => {
@@ -762,6 +766,7 @@ const ChatPage = (props: ChatProps) => {
                 content: msg,
                 openReasoning: openReasoning,
                 openSearch: openSearch,
+                fileIds: uploadedFileIds,
             });
         }, 500);
         // 只在第一次触发时弹出气泡
@@ -809,10 +814,8 @@ const ChatPage = (props: ChatProps) => {
                 </Flex>
 
                 <Flex gap='small'>
-                    <FileUpload onUploadSuccess={(files) => {
-                        // 处理上传成功的文件
-                        console.log('上传的文件:', files);
-                        // 这里可以添加文件处理逻辑
+                    <FileUpload onUploadSuccess={(ids) => {
+                        setUploadedFileIds(Array.isArray(ids) ? ids : [ids]);
                     }} />
                     {
                         !agent.isRequesting() ?
