@@ -239,6 +239,7 @@ const ChatPage = (props: ChatProps) => {
     const clickAddConversation = () => {
         addConversation(''); // 新建空白对话
         setMessages([]);
+        setUploadedFiles([]); // 新对话时清空文件上传列表
     }
 
     // 添加会话
@@ -873,6 +874,11 @@ const ChatPage = (props: ChatProps) => {
             }
         };
     }, []);
+
+    // 监听 activeConversationKey 变化，刷新网页或切换会话时清空文件上传列表
+    useEffect(() => {
+        setUploadedFiles([]);
+    }, [activeConversationKey]);
 
     return (
         <XProvider

@@ -171,6 +171,7 @@ export const  saveVoteAPI = async (param: VoteParam) => {
 }
 
 // 文件上传API
+// 返回 Long 类型的文件ID
 export const uploadFileAPI = async (file: File): Promise<ApiResponse<number>> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -183,6 +184,7 @@ export const uploadFileAPI = async (file: File): Promise<ApiResponse<number>> =>
 };
 
 // 批量文件上传API
+// 返回 Long 类型的文件ID数组
 export const uploadFilesBatchAPI = async (
   files: File[],
   userId: string,
