@@ -40,7 +40,7 @@ export const promptItems: PromptsProps['items'] = [
                 key: '1-2',
                 icon: <QuestionCircleOutlined/>,
                 label: `让Ai帮助你创建学生信息`,
-                description: `如何创建学生档案？`,
+                description: `如何创建学生档案?请列出Tool需要的参数, 不要模拟, 不要执行调用tool`,
             },
             {
                 key: '1-3',
@@ -53,49 +53,43 @@ export const promptItems: PromptsProps['items'] = [
     {
         key: '2',
         label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '完成一个批改作业任务'),
-        description: '如何进行作业批改?【共7步】',
+        description: '如何进行作业批改?【共6步】',
         children: [
             {
                 key: '2-1',
                 icon: <TagOutlined />,
                 label: `第一步: 点击文件上传,上传作业原题、答案到附件`,
-                description: `请你帮我保存作业, 如果缺少信息请告诉我, 保存成功后告诉我返回的信息`,
+                description: `请帮我保存作业原题和答案, 作业标题: [5.14xxx作业], 学科: [英语]`,
             },
             {
                 key: '2-2',
                 icon: <TagOutlined />,
-                label: `第二步: 输入刚才返回的作业id,然后发布一个作业给某班级`,
-                description: `我要发布一个作业给某班级, 请告诉我如何发布作业`,
+                label: `第二步: 输入刚才保存的作业标题, 发布作业给某班级`,
+                description: `发布[xxx作业]给[xxx班级],提交截止时间[5](非必填,默认24小时)`,
             },
             {
                 key: '2-3',
                 icon: <TagOutlined />,
-                label: `第三步: 由学生自己或老师上传作业答题卡照片`,
-                description: `请告诉我如何提交作业, 需要哪些信息`,
+                label: `第三步: 由学生自己或老师上传作业答题卡照片到附件`,
+                description: `我要提交作业, 作业标题: [xxx作业], 学生名: [张三]`,
             },
             {
                 key: '2-4',
                 icon: <TagOutlined />,
                 label: `第四步: 告诉Ai自动批改哪个班级的作业`,
-                description: `请告诉我如何提交作业, 需要哪些信息`,
+                description: `异步执行作业批改, 作业标题: [xxx作业], 班级名: [xxx班级], 学科:[xxx学科](非必填, 不填代表全学科)`,
             },
             {
                 key: '2-5',
                 icon: <TagOutlined />,
-                label: `第五步: 告诉Ai自动批改哪个班级的作业`,
-                description: `请告诉我批改指定班级指定学科的作业?`,
+                label: `第五步: 等待Ai批改完成后查询`,
+                description: `帮我查询作业批改结果, 作业标题: [xxx作业], 班级名: [xxx班级], 学科:[xxx学科](非必填, 不填代表全学科), 学生名: [张三](非必填, 不填代表全班)`,
             },
             {
                 key: '2-6',
                 icon: <TagOutlined />,
-                label: `第六步: 查询作业批改结果`,
-                description: `请告诉我如何查询作业批改结果, 需要提供哪些信息来查询`,
-            },
-            {
-                key: '2-7',
-                icon: <TagOutlined />,
-                label: `第七步: 人工批改作业`,
-                description: `请告诉我如何人工修改作业批改结果, 需要提供哪些信息`,
+                label: `第六步: 对Ai批改的结果进行人工干预, 此操作不会修改Ai批改结果`,
+                description: `对批改结果进行人工批改, 作业批改结果id: [12345], 人工批改意见: [xxxxxxxxxxxxxxxxxxxxxxxxxxxx]`,
             }
         ],
     }
