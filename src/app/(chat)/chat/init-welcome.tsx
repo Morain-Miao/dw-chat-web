@@ -98,6 +98,7 @@ export const promptItems: PromptsProps['items'] = [
 
 type Props = {
     handleSubmit: (value: string) => void;
+    handleFillInput?: (value: string) => void;
 }
 
 const STEPS_PER_PAGE = 3;
@@ -184,7 +185,9 @@ const InitWelcome = (props: Props) => {
                   }}
                 onItemClick={({data}) => {
                     if (data.description) {
-                        props.handleSubmit(data.description.toString())
+                        if (props.handleFillInput) {
+                            props.handleFillInput(data.description.toString());
+                        }
                     }
                 }}
             />

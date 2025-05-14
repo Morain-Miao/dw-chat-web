@@ -10,6 +10,7 @@ type FloatingWelcomeProps = {
   handleSubmit: (value: string) => void;
   showBubble: boolean;
   onBubbleHide: () => void;
+  handleFillInput?: (value: string) => void;
 };
 
 const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
@@ -17,6 +18,7 @@ const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
   handleSubmit,
   showBubble,
   onBubbleHide,
+  handleFillInput,
 }) => {
   const [open, setOpen] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(showBubble);
@@ -145,7 +147,9 @@ const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
               }}
               onItemClick={({ data }) => {
                 if (data.description) {
-                  handleSubmit(data.description.toString());
+                  if (typeof handleFillInput === 'function') {
+                    handleFillInput(data.description.toString());
+                  }
                   setOpen(false);
                 }
               }}

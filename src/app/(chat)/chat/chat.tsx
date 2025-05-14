@@ -704,7 +704,7 @@ const ChatPage = (props: ChatProps) => {
                 }))
             : [{ 
                 key: 'welcome-message',
-                content: (<InitWelcome handleSubmit={handleSubmitMsg}/>),
+                content: (<InitWelcome handleSubmit={handleSubmitMsg} handleFillInput={setInputTxt}/>),
                 variant: 'borderless' 
             }];
         updateMessageItems(finalMessageItems);
@@ -915,6 +915,7 @@ const ChatPage = (props: ChatProps) => {
                     handleSubmit={handleSubmitMsg}
                     showBubble={showBubble}
                     onBubbleHide={() => setShowBubble(false)}
+                    handleFillInput={setInputTxt}
                 />
 
                 <Flex
