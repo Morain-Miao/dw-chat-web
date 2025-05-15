@@ -89,7 +89,6 @@ dayjs.extend(isoWeek);
 
 const defaultConversationsItems: GetProp<ConversationsProps, 'items'> = []
 
-
 const ChatPage = () => {
     // Hooks and state initialization
     const [messageApi, contextHolder] = message.useMessage();
@@ -116,6 +115,8 @@ const ChatPage = () => {
     const abortControllerRef = useRef<AbortController | null>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
 
+    const hasInitRef = useRef(false);
+
     // 初始化加载历史消息
     useEffect(() => {
         const initData = async () => {
@@ -124,6 +125,26 @@ const ChatPage = () => {
         };
         initData();
     }, []);
+
+    // 初始化会话后，自动进入最后一个（最新）空白对话或新建空白对话（仅首次）
+    useEffect(() => {
+        if (hasInitRef.current) return;
+        if (conversationsItems && conversationsItems.length > 0) {
+            const lastConv = conversationsItems[conversationsItems.length - 1];
+            const current = conversationsItems.find(item => item.key === activeConversationKey);
+            if (current && current.label === '空白对话') {
+                hasInitRef.current = true;
+            } else if (lastConv.label === '空白对话') {
+                setActiveConversationKey(lastConv.key);
+                hasInitRef.current = true;
+            } else {
+                addConversation('').then(newKey => {
+                    if (newKey) setActiveConversationKey(newKey);
+                    hasInitRef.current = true;
+                });
+            }
+        }
+    }, [conversationsItems, activeConversationKey]);
 
     // 主题配置
     const customTheme: ThemeConfig = {
