@@ -158,7 +158,7 @@ const InitWelcome = (props: Props) => {
             {/* 欢迎语 */}
             <Welcome
                 variant="borderless"
-                icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+                icon={<img className="ai-welcome-avatar" src="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp" alt="AI助手" />}
                 title="您好,我是燕桥中学Ai智能助手,很高兴认识你!"
                 description="模型基于DeepSeek和阿里千问,可以回答你关于燕桥中学的任何问题,包括学生档案、作业批改、学生成绩等。"
                 extra={
@@ -204,6 +204,30 @@ const InitWelcome = (props: Props) => {
                     </Space>
                 }
             />
+            <style jsx global>{`
+              .ai-welcome-avatar {
+                width: 64px;
+                height: 64px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+                background: #fff;
+                object-fit: cover;
+              }
+              @media (max-width: 600px) {
+                .ai-welcome-avatar {
+                  width: 44px !important;
+                  height: 44px !important;
+                  border-radius: 8px !important;
+                }
+              }
+              @media (max-width: 400px) {
+                .ai-welcome-avatar {
+                  width: 32px !important;
+                  height: 32px !important;
+                  border-radius: 6px !important;
+                }
+              }
+            `}</style>
             {/* 提示词 */}
             <Prompts
                 title={'你想问什么?'}
