@@ -99,6 +99,33 @@ export const promptItems: PromptsProps['items'] = [
     }
 ];
 
+const batchUploadPromptItems: PromptsProps['items'] = [
+    {
+        key: 'batch-1',
+        label: '？',
+        description: '？',
+        children: [
+            {
+                key: 'batch-1-1',
+                icon: <QuestionCircleOutlined />,
+                label: '？',
+                description: '？',
+            },
+            {
+                key: 'batch-1-2',
+                icon: <QuestionCircleOutlined />,
+                label: '？',
+                description: '？',
+            },
+            {
+                key: 'batch-1-3',
+                icon: <QuestionCircleOutlined />,
+                label: '？',
+                description: '？',
+            },
+        ],
+    },
+];
 
 type Props = {
     handleSubmit: (value: string) => void;
@@ -119,6 +146,7 @@ export const MINIMIZED_WELCOME_HEIGHT = 56;
 const InitWelcome = (props: Props) => {
     const [stepPage, setStepPage] = useState(1);
     const [messageApi, contextHolder] = antdMessage.useMessage();
+    const [showBatchUpload, setShowBatchUpload] = useState(false);
     const steps = promptItems[1].children || [];
     const totalPages = Math.ceil(steps.length / STEPS_PER_PAGE);
     const pagedSteps = steps.slice((stepPage - 1) * STEPS_PER_PAGE, stepPage * STEPS_PER_PAGE);
@@ -159,6 +187,17 @@ const InitWelcome = (props: Props) => {
     ];
 
     const menuItems: MenuProps['items'] = [
+        {
+            key: 'welcome-page',
+            label: '欢迎页面',
+            onClick: () => setShowBatchUpload(false),
+        },
+        {
+            key: 'batch-upload',
+            label: '批量上传作业',
+            onClick: () => setShowBatchUpload(true),
+        },
+
         // 最小化功能从菜单中移除
     ];
 
@@ -276,30 +315,50 @@ const InitWelcome = (props: Props) => {
                 `}</style>
                 {/* 提示词最小化时隐藏，用display:none而不是条件渲染 */}
                 <div style={{ display: props.minimized ? 'none' : 'block', width: '100%' }}>
-                    <Prompts
-                        title={'你想问什么?'}
-                        items={pagedPromptItems}
-                        wrap
-                        styles={{
-                            item: {
-                              flex: 1,
-                              width: "100%",
-                              backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
-                              border: 0,
-                            },
-                            subItem: {
-                              background: "rgba(255,255,255,0.45)",
-                              border: "1px solid #FFF",
-                            },
-                          }}
-                        onItemClick={({data}) => {
-                            if (data.description) {
-                                if (props.handleFillInput) {
-                                    props.handleFillInput(data.description.toString());
+                    {showBatchUpload ? (
+                        <Prompts
+                            title={'？'}
+                            items={batchUploadPromptItems}
+                            wrap
+                            styles={{
+                                item: {
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
+                                    border: 0,
+                                },
+                                subItem: {
+                                    background: "rgba(255,255,255,0.45)",
+                                    border: "1px solid #FFF",
+                                },
+                            }}
+                        />
+                    ) : (
+                        <Prompts
+                            title={'你想问什么?'}
+                            items={pagedPromptItems}
+                            wrap
+                            styles={{
+                                item: {
+                                  flex: 1,
+                                  width: "100%",
+                                  backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
+                                  border: 0,
+                                },
+                                subItem: {
+                                  background: "rgba(255,255,255,0.45)",
+                                  border: "1px solid #FFF",
+                                },
+                              }}
+                            onItemClick={({data}) => {
+                                if (data.description) {
+                                    if (props.handleFillInput) {
+                                        props.handleFillInput(data.description.toString());
+                                    }
                                 }
-                            }
-                        }}
-                    />
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </Space>
