@@ -942,6 +942,17 @@ const ChatPage = () => {
         }
     }, [welcomeMinimized]);
 
+    useEffect(() => {
+        // 查找当前会话
+        const current = (conversationsItems || []).find(item => item.key === activeConversationKey);
+        // 新对话：label为"空白对话"
+        if (current && current.label === '空白对话') {
+            setWelcomeMinimized(false); // 展开
+        } else if (current) {
+            setWelcomeMinimized(true); // 收起
+        }
+    }, [activeConversationKey, conversationsItems]);
+
     return (
         <XProvider
             locale={zhCN}

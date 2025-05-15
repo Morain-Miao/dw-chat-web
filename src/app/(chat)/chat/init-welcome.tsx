@@ -13,7 +13,11 @@ import {
     SmileOutlined,
     TagOutlined,
     LeftOutlined,
-    RightOutlined
+    RightOutlined,
+    UpOutlined,
+    DownOutlined,
+    VerticalAlignTopOutlined,
+    VerticalAlignBottomOutlined
 } from "@ant-design/icons";
 
 
@@ -155,11 +159,7 @@ const InitWelcome = (props: Props) => {
     ];
 
     const menuItems: MenuProps['items'] = [
-        {
-            key: 'minimize',
-            label: '最小化',
-            onClick: () => props.onMinimize && props.onMinimize(),
-        },
+        // 最小化功能从菜单中移除
     ];
 
     const handleShare = async () => {
@@ -226,6 +226,17 @@ const InitWelcome = (props: Props) => {
                     gap: 8,
                     pointerEvents: 'auto',
                 }}>
+                    {/* 最小化/还原按钮 */}
+                    <Button
+                        icon={props.minimized ? <VerticalAlignBottomOutlined /> : <VerticalAlignTopOutlined />}
+                        onClick={() => {
+                            if (props.minimized) {
+                                props.onRestore && props.onRestore();
+                            } else {
+                                props.onMinimize && props.onMinimize();
+                            }
+                        }}
+                    />
                     <Button icon={<ShareAltOutlined/>} onClick={handleShare}/>
                     <Dropdown menu={{items: menuItems}} placement="bottomRight">
                         <Button icon={<EllipsisOutlined/>}/>
