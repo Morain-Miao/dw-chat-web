@@ -78,6 +78,7 @@ import { getCurrentUserId } from '@/utils/IdUtil';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import type { UploadFile } from 'antd/es/upload/interface';
+import '@/app/(chat)/chat/chat-fix.css'; // 新增：引入自定义底部输入框样式
 dayjs.extend(isoWeek);
 
 
@@ -1019,7 +1020,7 @@ const ChatPage = () => {
                     style={{margin: '0px auto', height: '94.5vh'}}
                 >
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                        <div style={{ paddingTop: welcomeHeight + 24 }}>
+                        <div style={{ paddingTop: welcomeHeight + 24, paddingBottom: 100 }}>
                             <Bubble.List
                                 className='max-w-2xl  mx-auto'
                                 items={messageItems}
@@ -1046,19 +1047,23 @@ const ChatPage = () => {
                             />
                         </div>
                     </div>
-                    <Sender
-                        className='max-w-2xl mx-auto'
-                        style={{marginTop: 'auto', borderRadius: '20px'}}
-                        autoSize={{minRows: 2, maxRows: 8}}
-                        placeholder='请输入你的问题...'
-                        loading={agent.isRequesting()}
-                        value={inputTxt}
-                        onChange={setInputTxt}
-                        onSubmit={handleSubmitMsg}
-                        onCancel={handleCancel}
-                        actions={false}
-                        footer={senderFooter}
-                    />
+                    {/* 固定底部输入框和AI提示 */}
+                    <div className="sender-fixed-bottom">
+                        <Sender
+                            className='max-w-2xl mx-auto'
+                            style={{ borderRadius: '20px' }}
+                            autoSize={{minRows: 2, maxRows: 8}}
+                            placeholder='请输入你的问题...'
+                            loading={agent.isRequesting()}
+                            value={inputTxt}
+                            onChange={setInputTxt}
+                            onSubmit={handleSubmitMsg}
+                            onCancel={handleCancel}
+                            actions={false}
+                            footer={senderFooter}
+                        />
+                        <div className="ai-generated-tip">内容由AI生成，请仔细甄别</div>
+                    </div>
                 </Flex>
             </ProLayout>
         </XProvider>

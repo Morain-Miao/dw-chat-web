@@ -1,0 +1,29 @@
+.sender-fixed-bottom {
+  position: fixed;
+  left: 250px;
+  bottom: 0;
+  width: calc(100vw - 250px);
+  background: #fff;
+  z-index: 100;
+  box-shadow: none !important;
+  border-top: 1px solid #eee;
+  padding: 8px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@media (max-width: 800px) {
+  .sender-fixed-bottom {
+    left: 0;
+    width: 100vw;
+    padding: 4px 0 0 0;
+  }
+}
+.ai-generated-tip {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  user-select: none;
+} 
