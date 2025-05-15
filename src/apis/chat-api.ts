@@ -172,11 +172,13 @@ export const  saveVoteAPI = async (param: VoteParam) => {
 
 // 文件上传API
 // 返回 Long 类型的文件ID
-export const uploadFileAPI = async (file: File): Promise<ApiResponse<number>> => {
+export const uploadFileAPI = async (file: File, userId?: string): Promise<ApiResponse<number>> => {
     const formData = new FormData();
     formData.append('file', file);
-    
-    return await clientFetcher('/chat/upload', {
+    if (userId) {
+        formData.append('userId', userId);
+    }
+    return await clientFetcher('/files/upload', {
         method: 'POST',
         body: formData,
         // 不要设置 Content-Type，浏览器会自动处理 multipart/form-data

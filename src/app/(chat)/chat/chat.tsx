@@ -25,7 +25,8 @@ import {
     DislikeOutlined, DownOutlined, EditOutlined,
     GlobalOutlined, LikeFilled, LikeOutlined,
     NodeIndexOutlined, PaperClipOutlined,
-    PlusOutlined, UpOutlined, UserOutlined
+    PlusOutlined, UpOutlined, UserOutlined,
+    CameraOutlined
 } from "@ant-design/icons";
 import {BubbleDataType} from "@ant-design/x/es/bubble/BubbleList";
 import zhCN from "antd/locale/zh_CN";
@@ -75,6 +76,7 @@ import { COOKIE_USER } from '@/utils/constant';
 import { getCurrentUserId } from '@/utils/IdUtil';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import type { UploadFile } from 'antd/es/upload/interface';
 dayjs.extend(isoWeek);
 
 
@@ -109,8 +111,10 @@ const ChatPage = (props: ChatProps) => {
     const [showBubble, setShowBubble] = useState(false);
     const [bubbleShown, setBubbleShown] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: number, name: string }>>([]);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     const abortControllerRef = useRef<AbortController | null>(null);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
 
     // 初始化加载历史消息
     useEffect(() => {
@@ -777,6 +781,42 @@ const ChatPage = (props: ChatProps) => {
         }
     };
 
+    // 新增：fileList 增删处理
+    const handleFileListChange = (file: UploadFile, isAdd?: boolean) => {
+        if (isAdd) {
+            setFileList(prev => [...prev, file]);
+        } else {
+            setFileList(prev => prev.filter(f => f.uid !== file.uid));
+            setUploadedFiles(prev => prev.filter(f => f.name !== file.name));
+        }
+    };
+
+    // 拍照上传后也加入 fileList
+    const handleCameraChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+            const userId = getCurrentUserId();
+            const response = await uploadFileAPI(file, userId);
+            if (response.code === 200) {
+                const filesInfo = { id: response.data, name: file.name || '照片' };
+                setUploadedFiles(prev => [...prev, filesInfo]);
+                // 同步加入 fileList
+                const uploadFile: UploadFile = {
+                    uid: Date.now().toString() + Math.random().toString(36).slice(2),
+                    name: file.name,
+                    status: 'done',
+                    originFileObj: file as any,
+                };
+                setFileList(prev => [...prev, uploadFile]);
+                // 新增：上传成功提示
+                messageApi.success('上传成功！');
+            } else {
+                messageApi.error('照片上传失败，请重试！');
+            }
+        }
+        if (cameraInputRef.current) cameraInputRef.current.value = '';
+    };
+
     /* 自定义发送框底部 */
     const senderFooter = ({components}: any) => {
         const {SendButton, LoadingButton, SpeechButton} = components;
@@ -815,13 +855,33 @@ const ChatPage = (props: ChatProps) => {
                 </Flex>
 
                 <Flex gap='small'>
-                    <FileUpload onUploadSuccess={(filesInfo) => {
-                        if (Array.isArray(filesInfo)) {
-                            setUploadedFiles(prev => [...prev, ...filesInfo]);
-                        } else {
-                            setUploadedFiles(prev => [...prev, filesInfo]);
-                        }
-                    }} />
+                    {/* 拍照上传按钮 */}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        style={{ display: 'none' }}
+                        ref={cameraInputRef}
+                        onChange={handleCameraChange}
+                    />
+                    <Tooltip title="拍照上传">
+                        <Button
+                            type="text"
+                            icon={<CameraOutlined style={{ fontSize: '18px', marginTop: '7px' }} />}
+                            onClick={() => cameraInputRef.current && cameraInputRef.current.click()}
+                        />
+                    </Tooltip>
+                    <FileUpload
+                        onUploadSuccess={(filesInfo) => {
+                            if (Array.isArray(filesInfo)) {
+                                setUploadedFiles(prev => [...prev, ...filesInfo]);
+                            } else {
+                                setUploadedFiles(prev => [...prev, filesInfo]);
+                            }
+                        }}
+                        fileList={fileList}
+                        onRemoveFile={handleFileListChange}
+                    />
                     {
                         !agent.isRequesting() ?
                             (

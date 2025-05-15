@@ -7,11 +7,12 @@ import { getCurrentUserId } from '@/utils/IdUtil';
 
 interface FileUploadProps {
     onUploadSuccess: (files: { id: number, name: string } | Array<{ id: number, name: string }>) => void;
+    fileList: UploadFile[];
+    onRemoveFile: (file: UploadFile) => void;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, fileList, onRemoveFile }) => {
     const [open, setOpen] = useState(false);
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploading, setUploading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -50,12 +51,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
     };
 
     const props = {
-        onRemove: (file: UploadFile) => {
-            const index = fileList.indexOf(file);
-            const newFileList = fileList.slice();
-            newFileList.splice(index, 1);
-            setFileList(newFileList);
-        },
+        onRemove: onRemoveFile,
         beforeUpload: (file: File) => {
             const rcFile = file as any; // 断言为 RcFile 以兼容 UploadFile
             const uploadFile: UploadFile = {
@@ -64,7 +60,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
                 status: 'done' as const,
                 originFileObj: rcFile,
             };
-            setFileList(prev => [...prev, uploadFile]);
+            // 由父组件管理 fileList，这里只触发添加
+            if (typeof onRemoveFile === 'function') {
+                // 传递第二个参数 true 表示添加
+                (onRemoveFile as any)(uploadFile, true);
+            }
             return false;
         },
         fileList,
