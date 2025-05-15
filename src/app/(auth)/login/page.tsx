@@ -156,11 +156,14 @@ const LoginPage = () => {
             >
                 <LoginForm
                     logo={<Logo/>}
-                    title={<span
-                        className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 ml-2">
+                    title={
+                        <span
+                            className="login-title-gradient"
+                        >
                             {appConfig.appName}
-                           </span>}
-                    subTitle="AI 聊天式管理系统"
+                        </span>
+                    }
+                    subTitle={<span className="login-subtitle">AI 聊天式管理系统</span>}
                     actions={
                         <Space>
                             其他登录方式
@@ -309,6 +312,40 @@ const LoginPage = () => {
                     </div>
                 </LoginForm>
             </Flex>
+            <style jsx global>{`
+                .login-title-gradient {
+                    font-size: 2.2rem;
+                    font-weight: bold;
+                    background: linear-gradient(to right, #22d3ee, #3b82f6);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    display: block;
+                    margin-left: 0.5rem;
+                    text-align: center;
+                    line-height: 1.1;
+                }
+                .login-subtitle {
+                    display: block;
+                    text-align: center;
+                    color: #888;
+                    font-size: 1.1rem;
+                    margin-top: 0.2rem;
+                    margin-bottom: 0.5rem;
+                }
+                @media (max-width: 600px) {
+                    .login-title-gradient {
+                        font-size: 1.3rem !important;
+                        margin-left: 0 !important;
+                        margin-top: 0.2rem;
+                        margin-bottom: 0.2rem;
+                    }
+                    .login-subtitle {
+                        font-size: 0.85rem !important;
+                        margin-top: 0.1rem;
+                        margin-bottom: 0.2rem;
+                    }
+                }
+            `}</style>
         </ProConfigProvider>
     );
 };

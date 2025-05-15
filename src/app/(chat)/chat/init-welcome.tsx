@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Space} from "antd";
+import {Button, Space, message as antdMessage} from "antd";
 import {Prompts, PromptsProps, Welcome} from "@ant-design/x";
 import {
     CommentOutlined,
@@ -108,6 +108,7 @@ const STEPS_PER_PAGE = 3;
  */
 const InitWelcome = (props: Props) => {
     const [stepPage, setStepPage] = useState(1);
+    const [messageApi, contextHolder] = antdMessage.useMessage();
     const steps = promptItems[1].children || [];
     const totalPages = Math.ceil(steps.length / STEPS_PER_PAGE);
     const pagedSteps = steps.slice((stepPage - 1) * STEPS_PER_PAGE, stepPage * STEPS_PER_PAGE);
@@ -153,6 +154,7 @@ const InitWelcome = (props: Props) => {
             direction='vertical'
             size={16}
         >
+            {contextHolder}
             {/* 欢迎语 */}
             <Welcome
                 variant="borderless"
@@ -161,7 +163,43 @@ const InitWelcome = (props: Props) => {
                 description="模型基于DeepSeek和阿里千问,可以回答你关于燕桥中学的任何问题,包括学生档案、作业批改、学生成绩等。"
                 extra={
                     <Space>
-                        <Button icon={<ShareAltOutlined/>}/>
+                        <Button
+                            icon={<ShareAltOutlined/>}
+                            onClick={async () => {
+                                const shareData = {
+                                    title: document.title,
+                                    text: '燕桥中学Ai智能助手，立即体验！',
+                                    url: window.location.href,
+                                };
+                                const copyText = `燕桥中学Ai智能助手，立即体验！\n${window.location.href}`;
+                                if (navigator.share) {
+                                    try {
+                                        await navigator.share(shareData);
+                                        return;
+                                    } catch (e) {
+                                        // 用户取消分享，无需处理
+                                    }
+                                }
+                                // 兼容性检测
+                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                    await navigator.clipboard.writeText(copyText);
+                                    messageApi.success('内容已复制到剪贴板！');
+                                } else {
+                                    // 兜底方案：创建input手动复制
+                                    const input = document.createElement('input');
+                                    input.value = copyText;
+                                    document.body.appendChild(input);
+                                    input.select();
+                                    try {
+                                        document.execCommand('copy');
+                                        messageApi.success('内容已复制到剪贴板！');
+                                    } catch (err) {
+                                        messageApi.info('请手动复制内容：' + copyText);
+                                    }
+                                    document.body.removeChild(input);
+                                }
+                            }}
+                        />
                         <Button icon={<EllipsisOutlined/>}/>
                     </Space>
                 }
