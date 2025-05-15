@@ -246,13 +246,9 @@ const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
           touchAction: 'none',
         }}
         onClick={() => {
-          if (typeof minimized !== 'undefined' && minimized && typeof onRestore === 'function') {
-            onRestore();
-          } else {
-            setOpen(true);
-            setBubbleVisible(false);
-            onBubbleHide();
-          }
+          setOpen(true);
+          setBubbleVisible(false);
+          onBubbleHide();
         }}
         onMouseDown={e => {
           setDragging(true);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
+import React, {useEffect, useRef, useState, useCallback, useMemo, useLayoutEffect} from 'react';
 import {useImmer} from 'use-immer';
 import {
     Bubble,
@@ -42,7 +42,7 @@ import {MessageInfo} from "@ant-design/x/es/use-x-chat";
 import Cookies from "js-cookie";
 // Local components
 import MarkdownRender from "@/app/(chat)/chat/markdown-render";
-import InitWelcome from "@/app/(chat)/chat/init-welcome";
+import InitWelcome, { MINIMIZED_WELCOME_HEIGHT } from "@/app/(chat)/chat/init-welcome";
 import Logo from "@/app/(chat)/chat/logo";
 import Footer from "@/app/(chat)/chat/footer";
 import HeaderActions from "@/app/(chat)/chat/header-actions";
@@ -110,6 +110,8 @@ const ChatPage = () => {
     const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: number, name: string }>>([]);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [welcomeMinimized, setWelcomeMinimized] = useState(false);
+    const [welcomeHeight, setWelcomeHeight] = useState(0);
+    const welcomeRef = useRef<HTMLDivElement>(null);
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -934,6 +936,12 @@ const ChatPage = () => {
         setUploadedFiles([]);
     }, [activeConversationKey]);
 
+    useLayoutEffect(() => {
+        if (welcomeRef.current) {
+            setWelcomeHeight(welcomeRef.current.offsetHeight);
+        }
+    }, [welcomeMinimized]);
+
     return (
         <XProvider
             locale={zhCN}
@@ -979,19 +987,24 @@ const ChatPage = () => {
                     style={{margin: '0px auto', height: '94.5vh'}}
                 >
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                        <Bubble.List
-                            className='max-w-2xl  mx-auto'
-                            items={messageItems}
-                        />
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '100%',
-                            maxWidth: 700,
-                            zIndex: 20
-                        }}>
+                        <div style={{ paddingTop: welcomeHeight + 24 }}>
+                            <Bubble.List
+                                className='max-w-2xl  mx-auto'
+                                items={messageItems}
+                            />
+                        </div>
+                        <div
+                            ref={welcomeRef}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: '100%',
+                                maxWidth: 700,
+                                zIndex: 20
+                            }}
+                        >
                             <InitWelcome
                                 handleSubmit={handleSubmitMsg}
                                 handleFillInput={setInputTxt}

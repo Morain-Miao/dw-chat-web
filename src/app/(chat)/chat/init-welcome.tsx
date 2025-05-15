@@ -106,6 +106,9 @@ type Props = {
 
 const STEPS_PER_PAGE = 3;
 
+// 最小化时欢迎区高度
+export const MINIMIZED_WELCOME_HEIGHT = 56;
+
 /**
  * 初始态的欢迎语和提示词
  */
@@ -202,7 +205,7 @@ const InitWelcome = (props: Props) => {
             {contextHolder}
             <div style={{
                 position: 'relative',
-                minHeight: 120,
+                minHeight: props.minimized ? MINIMIZED_WELCOME_HEIGHT : 120,
                 maxWidth: 700,
                 margin: '0 auto',
                 width: '100%',
