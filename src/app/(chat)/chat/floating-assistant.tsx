@@ -124,7 +124,7 @@ const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
           <Space direction="vertical" size={16} style={{ width: '100%' }}>
             <Welcome
               variant="borderless"
-              icon={WELCOME_ICON}
+              icon={<img className="modal-ai-avatar" src={WELCOME_ICON} alt="AI助手" />}
               title="您好,我是燕桥中学Ai智能助手,很高兴认识你!"
               description="模型基于DeepSeek和阿里千问,可以回答你关于燕桥中学的任何问题,包括学生档案、作业批改、学生成绩等。"
               extra={<Space />}
@@ -174,6 +174,22 @@ const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
                 min-width: 40px !important;
                 min-height: 40px !important;
                 font-size: 20px !important;
+              }
+              .modal-ai-avatar {
+                display: block;
+                margin: 0 auto;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+                background: #fff;
+                object-fit: contain;
+              }
+            }
+            @media (max-width: 400px) {
+              .modal-ai-avatar {
+                width: 44px !important;
+                height: 44px !important;
               }
             }
           `}

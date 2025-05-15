@@ -206,25 +206,25 @@ const InitWelcome = (props: Props) => {
             />
             <style jsx global>{`
               .ai-welcome-avatar {
-                width: 64px;
-                height: 64px;
-                border-radius: 12px;
+                display: block;
+                margin: 0 auto;
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.13);
                 background: #fff;
-                object-fit: cover;
+                object-fit: contain;
               }
               @media (max-width: 600px) {
                 .ai-welcome-avatar {
-                  width: 44px !important;
-                  height: 44px !important;
-                  border-radius: 8px !important;
+                  width: 60px !important;
+                  height: 60px !important;
                 }
               }
               @media (max-width: 400px) {
                 .ai-welcome-avatar {
-                  width: 32px !important;
-                  height: 32px !important;
-                  border-radius: 6px !important;
+                  width: 44px !important;
+                  height: 44px !important;
                 }
               }
             `}</style>
