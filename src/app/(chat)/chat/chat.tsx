@@ -48,7 +48,7 @@ import HeaderActions from "@/app/(chat)/chat/header-actions";
 import {DeepSeekIcon, PanelLeftClose, PanelLeftOpen} from "@/components/Icons";
 import AvatarDropdown from "@/app/(chat)/chat/avatar-dropdown";
 import FileUpload from "@/app/(chat)/chat/file-upload";
-import FloatingWelcome from './FloatingWelcome';
+import FloatingAssistant from './floating-assistant';
 import { promptItems } from './init-welcome';
 
 // APIs
@@ -89,11 +89,7 @@ dayjs.extend(isoWeek);
 const defaultConversationsItems: GetProp<ConversationsProps, 'items'> = []
 
 
-type ChatProps = {
-    defaultConversationItems?: Conversation[];
-}
-
-const ChatPage = (props: ChatProps) => {
+const ChatPage = () => {
     // Hooks and state initialization
     const [messageApi, contextHolder] = message.useMessage();
     const {token} = theme.useToken();
@@ -102,7 +98,7 @@ const ChatPage = (props: ChatProps) => {
 
     const [inputTxt, setInputTxt] = useState('');
     const [requestLoading, setRequestLoading] = useState(false);
-    const [conversationsItems, setConversationsItems] = useState(props.defaultConversationItems);
+    const [conversationsItems, setConversationsItems] = useState<Conversation[]>([]);
     const [activeConversationKey, setActiveConversationKey] = useState('');
     const [openSearch, setOpenSearch] = useState(false);
     const [openReasoning, setOpenReasoning] = useState(false);
@@ -970,7 +966,7 @@ const ChatPage = (props: ChatProps) => {
                 </div>
 
                 {/* 悬浮欢迎页组件 */}
-                <FloatingWelcome
+                <FloatingAssistant
                     promptItems={promptItems}
                     handleSubmit={handleSubmitMsg}
                     showBubble={showBubble}

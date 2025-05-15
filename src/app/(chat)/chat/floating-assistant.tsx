@@ -5,7 +5,7 @@ import { CloseOutlined } from '@ant-design/icons';
 
 const WELCOME_ICON = "https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp";
 
-type FloatingWelcomeProps = {
+type FloatingAssistantProps = {
   promptItems: PromptsProps['items'];
   handleSubmit: (value: string) => void;
   showBubble: boolean;
@@ -13,7 +13,7 @@ type FloatingWelcomeProps = {
   handleFillInput?: (value: string) => void;
 };
 
-const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
+const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
   promptItems,
   handleSubmit,
   showBubble,
@@ -268,4 +268,4 @@ const FloatingWelcome: React.FC<FloatingWelcomeProps> = ({
   );
 };
 
-export default FloatingWelcome; 
+export default FloatingAssistant; 
