@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Space, message as antdMessage} from "antd";
+import {Button, Space, message as antdMessage, Dropdown, MenuProps} from "antd";
 import {Prompts, PromptsProps, Welcome} from "@ant-design/x";
 import {
     CommentOutlined,
@@ -99,6 +99,9 @@ export const promptItems: PromptsProps['items'] = [
 type Props = {
     handleSubmit: (value: string) => void;
     handleFillInput?: (value: string) => void;
+    minimized?: boolean;
+    onMinimize?: () => void;
+    onRestore?: () => void;
 }
 
 const STEPS_PER_PAGE = 3;
@@ -148,111 +151,143 @@ const InitWelcome = (props: Props) => {
         }
     ];
 
+    const menuItems: MenuProps['items'] = [
+        {
+            key: 'minimize',
+            label: '最小化',
+            onClick: () => props.onMinimize && props.onMinimize(),
+        },
+    ];
+
+    const handleShare = async () => {
+        const shareData = {
+            title: document.title,
+            text: '燕桥中学Ai智能助手，立即体验！',
+            url: window.location.href,
+        };
+        const copyText = `燕桥中学Ai智能助手，立即体验！\n${window.location.href}`;
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+                return;
+            } catch (e) {
+                // 用户取消分享，无需处理
+            }
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(copyText);
+            messageApi.success('内容已复制到剪贴板！');
+        } else {
+            const input = document.createElement('input');
+            input.value = copyText;
+            document.body.appendChild(input);
+            input.select();
+            try {
+                document.execCommand('copy');
+                messageApi.success('内容已复制到剪贴板！');
+            } catch (err) {
+                messageApi.info('请手动复制内容：' + copyText);
+            }
+            document.body.removeChild(input);
+        }
+    };
+
     return (
         <Space
             className='pt-10'
             direction='vertical'
             size={16}
+            style={{ width: '100%' }}
         >
             {contextHolder}
-            {/* 欢迎语 */}
-            <Welcome
-                variant="borderless"
-                icon={<img className="ai-welcome-avatar" src="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp" alt="AI助手" />}
-                title="您好,我是燕桥中学Ai智能助手,很高兴认识你!"
-                description="模型基于DeepSeek和阿里千问,可以回答你关于燕桥中学的任何问题,包括学生档案、作业批改、学生成绩等。"
-                extra={
-                    <Space>
-                        <Button
-                            icon={<ShareAltOutlined/>}
-                            onClick={async () => {
-                                const shareData = {
-                                    title: document.title,
-                                    text: '燕桥中学Ai智能助手，立即体验！',
-                                    url: window.location.href,
-                                };
-                                const copyText = `燕桥中学Ai智能助手，立即体验！\n${window.location.href}`;
-                                if (navigator.share) {
-                                    try {
-                                        await navigator.share(shareData);
-                                        return;
-                                    } catch (e) {
-                                        // 用户取消分享，无需处理
-                                    }
-                                }
-                                // 兼容性检测
-                                if (navigator.clipboard && navigator.clipboard.writeText) {
-                                    await navigator.clipboard.writeText(copyText);
-                                    messageApi.success('内容已复制到剪贴板！');
-                                } else {
-                                    // 兜底方案：创建input手动复制
-                                    const input = document.createElement('input');
-                                    input.value = copyText;
-                                    document.body.appendChild(input);
-                                    input.select();
-                                    try {
-                                        document.execCommand('copy');
-                                        messageApi.success('内容已复制到剪贴板！');
-                                    } catch (err) {
-                                        messageApi.info('请手动复制内容：' + copyText);
-                                    }
-                                    document.body.removeChild(input);
-                                }
-                            }}
-                        />
+            <div style={{
+                position: 'relative',
+                minHeight: 120,
+                maxWidth: 700,
+                margin: '0 auto',
+                width: '100%',
+                background: '#fff',
+                borderRadius: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                {/* 右上角按钮区，始终显示在欢迎区右上角 */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    zIndex: 10,
+                    display: 'flex',
+                    gap: 8,
+                    pointerEvents: 'auto',
+                }}>
+                    <Button icon={<ShareAltOutlined/>} onClick={handleShare}/>
+                    <Dropdown menu={{items: menuItems}} placement="bottomRight">
                         <Button icon={<EllipsisOutlined/>}/>
-                    </Space>
-                }
-            />
-            <style jsx global>{`
-              .ai-welcome-avatar {
-                display: block;
-                margin: 0 auto;
-                width: 80px;
-                height: 80px;
-                border-radius: 50%;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-                background: #fff;
-                object-fit: contain;
-              }
-              @media (max-width: 600px) {
-                .ai-welcome-avatar {
-                  width: 60px !important;
-                  height: 60px !important;
-                }
-              }
-              @media (max-width: 400px) {
-                .ai-welcome-avatar {
-                  width: 44px !important;
-                  height: 44px !important;
-                }
-              }
-            `}</style>
-            {/* 提示词 */}
-            <Prompts
-                title={'你想问什么?'}
-                items={pagedPromptItems}
-                wrap
-                styles={{
-                    item: {
-                      flex: 1,
-                      width: "100%",
-                      backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
-                      border: 0,
-                    },
-                    subItem: {
-                      background: "rgba(255,255,255,0.45)",
-                      border: "1px solid #FFF",
-                    },
-                  }}
-                onItemClick={({data}) => {
-                    if (data.description) {
-                        if (props.handleFillInput) {
-                            props.handleFillInput(data.description.toString());
-                        }
+                    </Dropdown>
+                </div>
+                {/* 欢迎标题栏始终居中，最小化时隐藏AI头像 */}
+                <Welcome
+                    variant="borderless"
+                    icon={props.minimized ? null : <img className="ai-welcome-avatar" src="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp" alt="AI助手" />}
+                    title={props.minimized ? '' : "您好,我是燕桥中学Ai智能助手,很高兴认识你!"}
+                    description={props.minimized ? '' : "模型基于DeepSeek和阿里千问,可以回答你关于燕桥中学的任何问题,包括学生档案、作业批改、学生成绩等。"}
+                    extra={null}
+                    style={{ minHeight: 80, width: '100%' }}
+                />
+                <style jsx global>{`
+                  .ai-welcome-avatar {
+                    display: block;
+                    margin: 0 auto;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: #fff;
+                    object-fit: contain;
+                  }
+                  @media (max-width: 600px) {
+                    .ai-welcome-avatar {
+                      width: 60px !important;
+                      height: 60px !important;
                     }
-                }}
-            />
+                  }
+                  @media (max-width: 400px) {
+                    .ai-welcome-avatar {
+                      width: 44px !important;
+                      height: 44px !important;
+                    }
+                  }
+                `}</style>
+                {/* 提示词最小化时隐藏，用display:none而不是条件渲染 */}
+                <div style={{ display: props.minimized ? 'none' : 'block', width: '100%' }}>
+                    <Prompts
+                        title={'你想问什么?'}
+                        items={pagedPromptItems}
+                        wrap
+                        styles={{
+                            item: {
+                              flex: 1,
+                              width: "100%",
+                              backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
+                              border: 0,
+                            },
+                            subItem: {
+                              background: "rgba(255,255,255,0.45)",
+                              border: "1px solid #FFF",
+                            },
+                          }}
+                        onItemClick={({data}) => {
+                            if (data.description) {
+                                if (props.handleFillInput) {
+                                    props.handleFillInput(data.description.toString());
+                                }
+                            }
+                        }}
+                    />
+                </div>
+            </div>
         </Space>
     );
 };

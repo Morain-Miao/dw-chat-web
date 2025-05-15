@@ -19,6 +19,7 @@ import {
     ThemeConfig, Flex,
     Modal, Input, Typography,
     type AvatarProps,
+    Dropdown, MenuProps
 } from "antd";
 import {
     CopyOutlined, DeleteOutlined, DislikeFilled,
@@ -26,7 +27,7 @@ import {
     GlobalOutlined, LikeFilled, LikeOutlined,
     NodeIndexOutlined, PaperClipOutlined,
     PlusOutlined, UpOutlined, UserOutlined,
-    CameraOutlined
+    CameraOutlined, ShareAltOutlined, EllipsisOutlined
 } from "@ant-design/icons";
 import {BubbleDataType} from "@ant-design/x/es/bubble/BubbleList";
 import zhCN from "antd/locale/zh_CN";
@@ -108,6 +109,7 @@ const ChatPage = () => {
     const [bubbleShown, setBubbleShown] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: number, name: string }>>([]);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [welcomeMinimized, setWelcomeMinimized] = useState(false);
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -678,37 +680,31 @@ const ChatPage = () => {
 
     useEffect(() => {
         const finalMessageItems: BubbleDataType[] = messages.length > 0
-            ? messages.map((
-                {id, message, status}) =>
-                ({
-                    key: id || message.id || `msg-${Date.now()}-${Math.random()}`, // 确保 key 唯一
-                    role: message.type,
-                    header: (message.type?.toLowerCase() === 'ai' && <MessageHeader message={message as AIAgentMessage}/>),
-                    content: message.content,
-                    footer: ((!agent.isRequesting() && message.type?.toLowerCase() === 'ai') &&
-                        <MessageFooter message={message as AIAgentMessage}/>
-                    ),
-                    loading: status === 'loading' && requestLoading,
-                    placement: message.type?.toLowerCase() === 'ai' ? 'start' : 'end',
-                    variant: message.type?.toLowerCase() === 'ai' ? (message.content ? 'outlined' : 'borderless') : undefined,
-                    avatar: message.type?.toLowerCase() === 'ai' ?
-                        {
-                            icon: <DeepSeekIcon/>,
-                            style: {border: '1px solid #c5eaee', backgroundColor: 'white'}
-                        } : undefined,
-                    typing: message.type?.toLowerCase() === 'ai' && 'loading' in message && message.loading ?
-                        {step: 5, interval: 50} : undefined,
-                    style: message.type?.toLowerCase() === 'ai' ? {maxWidth: 700} : undefined,
-                    messageRender: message.type?.toLowerCase() === 'ai' ?
-                        ((content) => (<MarkdownRender content={content}/>)) : undefined,
-                }))
-            : [{ 
-                key: 'welcome-message',
-                content: (<InitWelcome handleSubmit={handleSubmitMsg} handleFillInput={setInputTxt}/>),
-                variant: 'borderless' 
-            }];
+            ? messages.map(({id, message, status}) => ({
+                key: id || message.id || `msg-${Date.now()}-${Math.random()}`,
+                role: message.type,
+                header: (message.type?.toLowerCase() === 'ai' && <MessageHeader message={message as AIAgentMessage}/>),
+                content: message.content,
+                footer: ((!agent.isRequesting() && message.type?.toLowerCase() === 'ai') &&
+                    <MessageFooter message={message as AIAgentMessage}/>
+                ),
+                loading: status === 'loading' && requestLoading,
+                placement: message.type?.toLowerCase() === 'ai' ? 'start' : 'end',
+                variant: message.type?.toLowerCase() === 'ai' ? (message.content ? 'outlined' : 'borderless') : undefined,
+                avatar: message.type?.toLowerCase() === 'ai' ?
+                    {
+                        icon: <DeepSeekIcon/>,
+                        style: {border: '1px solid #c5eaee', backgroundColor: 'white'}
+                    } : undefined,
+                typing: message.type?.toLowerCase() === 'ai' && 'loading' in message && message.loading ?
+                    {step: 5, interval: 50} : undefined,
+                style: message.type?.toLowerCase() === 'ai' ? {maxWidth: 700} : undefined,
+                messageRender: message.type?.toLowerCase() === 'ai' ?
+                    ((content) => (<MarkdownRender content={content}/>)) : undefined,
+            }))
+            : [];
         updateMessageItems(finalMessageItems);
-    }, [messages]);
+    }, [messages, welcomeMinimized]);
 
 
     /**
@@ -775,6 +771,8 @@ const ChatPage = () => {
             setShowBubble(true);
             setBubbleShown(true);
         }
+        // 发送消息后最小化欢迎页
+        setWelcomeMinimized(true);
     };
 
     // 新增：fileList 增删处理
@@ -964,7 +962,6 @@ const ChatPage = () => {
                 <div className='fixed z-10 h-12 w-12'>
                     {SidebarTrigger}
                 </div>
-
                 {/* 悬浮欢迎页组件 */}
                 <FloatingAssistant
                     promptItems={promptItems}
@@ -972,19 +969,37 @@ const ChatPage = () => {
                     showBubble={showBubble}
                     onBubbleHide={() => setShowBubble(false)}
                     handleFillInput={setInputTxt}
+                    minimized={welcomeMinimized}
+                    onRestore={() => setWelcomeMinimized(false)}
                 />
-
                 <Flex
                     vertical
                     gap={'large'}
                     className='w-full'
                     style={{margin: '0px auto', height: '94.5vh'}}
                 >
-                    <div className='h-full w-full px-1 overflow-y-auto scrollbar-container'>
+                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         <Bubble.List
                             className='max-w-2xl  mx-auto'
                             items={messageItems}
                         />
+                        <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: '100%',
+                            maxWidth: 700,
+                            zIndex: 20
+                        }}>
+                            <InitWelcome
+                                handleSubmit={handleSubmitMsg}
+                                handleFillInput={setInputTxt}
+                                minimized={welcomeMinimized}
+                                onMinimize={() => setWelcomeMinimized(true)}
+                                onRestore={() => setWelcomeMinimized(false)}
+                            />
+                        </div>
                     </div>
                     <Sender
                         className='max-w-2xl mx-auto'

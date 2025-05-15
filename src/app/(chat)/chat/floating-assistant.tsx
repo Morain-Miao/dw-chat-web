@@ -11,6 +11,8 @@ type FloatingAssistantProps = {
   showBubble: boolean;
   onBubbleHide: () => void;
   handleFillInput?: (value: string) => void;
+  minimized?: boolean;
+  onRestore?: () => void;
 };
 
 const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
@@ -19,6 +21,8 @@ const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
   showBubble,
   onBubbleHide,
   handleFillInput,
+  minimized,
+  onRestore,
 }) => {
   const [open, setOpen] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(showBubble);
@@ -242,9 +246,13 @@ const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
           touchAction: 'none',
         }}
         onClick={() => {
-          setOpen(true);
-          setBubbleVisible(false);
-          onBubbleHide();
+          if (typeof minimized !== 'undefined' && minimized && typeof onRestore === 'function') {
+            onRestore();
+          } else {
+            setOpen(true);
+            setBubbleVisible(false);
+            onBubbleHide();
+          }
         }}
         onMouseDown={e => {
           setDragging(true);
