@@ -19,6 +19,7 @@ import {
     VerticalAlignTopOutlined,
     VerticalAlignBottomOutlined
 } from "@ant-design/icons";
+import BatchUpload from './batch-upload';
 
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
@@ -102,27 +103,15 @@ export const promptItems: PromptsProps['items'] = [
 const batchUploadPromptItems: PromptsProps['items'] = [
     {
         key: 'batch-1',
-        label: '？',
-        description: '？',
+        label: '批量上传作业',
+        description: '选择作业和班级，点击学生名字快速生成提交作业命令',
         children: [
             {
                 key: 'batch-1-1',
                 icon: <QuestionCircleOutlined />,
-                label: '？',
-                description: '？',
-            },
-            {
-                key: 'batch-1-2',
-                icon: <QuestionCircleOutlined />,
-                label: '？',
-                description: '？',
-            },
-            {
-                key: 'batch-1-3',
-                icon: <QuestionCircleOutlined />,
-                label: '？',
-                description: '？',
-            },
+                label: '批量上传作业',
+                description: '选择作业和班级，点击学生名字快速生成提交作业命令',
+            }
         ],
     },
 ];
@@ -316,9 +305,19 @@ const InitWelcome = (props: Props) => {
                 {/* 提示词最小化时隐藏，用display:none而不是条件渲染 */}
                 <div style={{ display: props.minimized ? 'none' : 'block', width: '100%' }}>
                     {showBatchUpload ? (
+                        <div style={{ padding: '16px' }}>
+                            <BatchUpload
+                                onStudentClick={(homework, student) => {
+                                    if (props.handleFillInput) {
+                                        props.handleFillInput(`我要提交作业, 作业标题: [${homework}], 学生名: [${student}]`);
+                                    }
+                                }}
+                            />
+                        </div>
+                    ) : (
                         <Prompts
-                            title={'？'}
-                            items={batchUploadPromptItems}
+                            title={'你想问什么?'}
+                            items={pagedPromptItems}
                             wrap
                             styles={{
                                 item: {
@@ -332,24 +331,6 @@ const InitWelcome = (props: Props) => {
                                     border: "1px solid #FFF",
                                 },
                             }}
-                        />
-                    ) : (
-                        <Prompts
-                            title={'你想问什么?'}
-                            items={pagedPromptItems}
-                            wrap
-                            styles={{
-                                item: {
-                                  flex: 1,
-                                  width: "100%",
-                                  backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
-                                  border: 0,
-                                },
-                                subItem: {
-                                  background: "rgba(255,255,255,0.45)",
-                                  border: "1px solid #FFF",
-                                },
-                              }}
                             onItemClick={({data}) => {
                                 if (data.description) {
                                     if (props.handleFillInput) {
