@@ -81,6 +81,10 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import '@/app/(chat)/chat/chat-fix.css'; // 新增：引入自定义底部输入框样式
 dayjs.extend(isoWeek);
 
+// 需要ResizeObserver监听输入框高度
+// @ts-ignore
+const isBrowser = typeof window !== 'undefined';
+const ResizeObserver = isBrowser ? (window.ResizeObserver || require('resize-observer-polyfill')) : undefined;
 
 // 动态导入
 /*const ProLayout = dynamic(
@@ -112,6 +116,9 @@ const ChatPage = () => {
     const [welcomeMinimized, setWelcomeMinimized] = useState(false);
     const [welcomeHeight, setWelcomeHeight] = useState(0);
     const welcomeRef = useRef<HTMLDivElement>(null);
+    const messageListRef = useRef<HTMLDivElement>(null);
+    const senderRef = useRef<HTMLDivElement>(null);
+    const [senderHeight, setSenderHeight] = useState(100); // 默认100
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -964,6 +971,20 @@ const ChatPage = () => {
         }
     }, [welcomeMinimized]);
 
+    // 用ResizeObserver监听输入框高度变化
+    useLayoutEffect(() => {
+        if (!senderRef.current || !ResizeObserver) return;
+        const ro = new ResizeObserver(() => {
+            if (senderRef.current) {
+                setSenderHeight(senderRef.current.offsetHeight);
+            }
+        });
+        ro.observe(senderRef.current);
+        // 初始化高度
+        setSenderHeight(senderRef.current.offsetHeight);
+        return () => ro.disconnect();
+    }, []);
+
     useEffect(() => {
         // 查找当前会话
         const current = (conversationsItems || []).find(item => item.key === activeConversationKey);
@@ -974,6 +995,12 @@ const ChatPage = () => {
             setWelcomeMinimized(true); // 收起
         }
     }, [activeConversationKey, conversationsItems]);
+
+    useEffect(() => {
+        if (messageListRef.current) {
+            messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+        }
+    }, [messageItems]);
 
     return (
         <XProvider
@@ -1017,12 +1044,23 @@ const ChatPage = () => {
                     vertical
                     gap={'large'}
                     className='w-full'
-                    style={{margin: '0px auto', height: '94.5vh'}}
+                    style={{margin: '0px auto', height: '100vh'}}
                 >
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                        <div style={{ paddingTop: welcomeHeight + 24, paddingBottom: 100 }}>
+                        <div
+                            ref={messageListRef}
+                            style={{
+                                position: 'absolute',
+                                top: welcomeHeight + 24,
+                                left: 0,
+                                right: 0,
+                                bottom: senderHeight, // 动态高度
+                                overflowY: 'auto',
+                                padding: '0 0 24px 0',
+                            }}
+                        >
                             <Bubble.List
-                                className='max-w-2xl  mx-auto'
+                                className='max-w-2xl mx-auto'
                                 items={messageItems}
                             />
                         </div>
@@ -1035,7 +1073,9 @@ const ChatPage = () => {
                                 transform: 'translateX(-50%)',
                                 width: '100%',
                                 maxWidth: 700,
-                                zIndex: 20
+                                zIndex: 20,
+                                maxHeight: `calc(100vh - ${senderHeight}px)`,
+                                overflowY: 'auto',
                             }}
                         >
                             <InitWelcome
@@ -1048,7 +1088,7 @@ const ChatPage = () => {
                         </div>
                     </div>
                     {/* 固定底部输入框和AI提示 */}
-                    <div className="sender-fixed-bottom">
+                    <div className="sender-fixed-bottom" ref={senderRef}>
                         <Sender
                             className='max-w-2xl mx-auto'
                             style={{ borderRadius: '20px' }}
