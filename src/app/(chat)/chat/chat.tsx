@@ -802,8 +802,9 @@ const ChatPage = () => {
             setShowBubble(true);
             setBubbleShown(true);
         }
-        // 发送消息后最小化欢迎页
-        setWelcomeMinimized(true);
+        // 清空文件列表
+        setFileList([]);
+        setUploadedFiles([]);
     };
 
     // 新增：fileList 增删处理

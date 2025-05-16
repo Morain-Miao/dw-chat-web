@@ -65,6 +65,7 @@ export async function clientFetcher(url: string, options: RequestInit = {}): Pro
 
 /**
  * 封装客户端组件 Fetch
+ * 用于 Chat后端服务的 Fetch
  *
  * @param url
  * @param options
@@ -120,7 +121,7 @@ export async function clientCoreFetcher(url: string, options: RequestInit = {}):
 /**
  * 封装服务端组件 Fetch
  *
- * 用于在 服务组件 fetch api/route
+ * 用于Core服务的 Fetch 
  *
  * @param url
  * @param options
