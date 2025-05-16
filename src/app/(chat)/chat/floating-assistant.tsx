@@ -25,7 +25,7 @@ const FloatingAssistant: React.FC<FloatingAssistantProps> = ({
   onRestore,
 }) => {
   const [open, setOpen] = useState(false);
-  const [bubbleVisible, setBubbleVisible] = useState(showBubble);
+  const [bubbleVisible, setBubbleVisible] = useState(false);
   const [iconPosition, setIconPosition] = useState<{ top: number; right: number }>({ top: 32, right: 40 });
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
