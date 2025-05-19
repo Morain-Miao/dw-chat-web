@@ -5,6 +5,7 @@ import rehypeRaw from 'rehype-raw';
 import DOMPurify from 'dompurify';
 import hljs from 'highlight.js'; // 高亮
 import 'highlight.js/styles/atom-one-light.css'; // 高亮样式
+import remarkGfm from 'remark-gfm';
 
 // 代码块高亮渲染器
 const CodeBlock = ({ className, children }: any) => {
@@ -19,6 +20,17 @@ const CodeBlock = ({ className, children }: any) => {
         </pre>
     );
 };
+
+// 自定义表格渲染组件
+const Table = (props: any) => (
+  <table className="markdown-table">{props.children}</table>
+);
+const Th = (props: any) => (
+  <th className="markdown-th">{props.children}</th>
+);
+const Td = (props: any) => (
+  <td className="markdown-td">{props.children}</td>
+);
 
 type Props = {
     content: string;
@@ -53,11 +65,45 @@ function extractBody(html: string): string {
     return html;
 }
 
+// 自动修正一行伪表格为标准markdown表格，增强：去除blockquote和代码块包裹
+function autoFixOneLineTable(content: string): string {
+    content = content.trim();
+    // 去除 blockquote 包裹
+    if (content.startsWith('>')) {
+        content = content.replace(/^> ?/gm, '');
+    }
+    // 去除代码块包裹
+    if (content.startsWith('```') && content.endsWith('```')) {
+        content = content.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
+    }
+    // 新增：如果内容有多行，每行都包含||，也自动修正
+    const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 1 && lines.every(l => l.includes('||'))) {
+        // 合并所有行为一行再处理
+        content = lines.join(' ');
+    }
+    // 下面是原有的伪表格修正逻辑
+    if (/\|.*\|.*\|.*\|.*\|/g.test(content) && content.includes('||')) {
+        const groups = content.split('||').map(s => s.trim()).filter(Boolean);
+        const lines = groups.map(line => {
+            let l = line;
+            if (!l.startsWith('|')) l = '| ' + l;
+            if (!l.endsWith('|')) l = l + ' |';
+            return l;
+        });
+        return lines.join('\n');
+    }
+    return content;
+}
+
 /**
  * 支持 Markdown + HTML 混合渲染，带高亮
  */
 const MarkdownRender = (props: Props) => {
-    const raw = props.content;
+    
+    let raw = props.content;
+    // 自动修正一行伪表格
+    raw = autoFixOneLineTable(raw);
     const htmlBlock = extractHtmlCodeBlock(raw);
     const safeContent = DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
 
@@ -86,9 +132,13 @@ const MarkdownRender = (props: Props) => {
         <Typography>
             <div className="markdown-body">
                 <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeRaw]}
                     components={{
-                        code: CodeBlock
+                        code: CodeBlock,
+                        table: Table,
+                        th: Th,
+                        td: Td
                     }}
                 >
                     {safeContent}

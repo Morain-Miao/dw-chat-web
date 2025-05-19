@@ -108,6 +108,10 @@ npm install @types/markdown-it --save-dev
 npm install react-markdown rehype-raw dompurify
 ```
 
+Markdown格式化
+```shell
+npm install remark-gfm
+```
 
 代码高亮
 ```shell

@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {Button, Space, message as antdMessage, Dropdown, MenuProps} from "antd";
 import {Prompts, PromptsProps, Welcome} from "@ant-design/x";
 import {
-    CommentOutlined,
     EllipsisOutlined,
     FireOutlined,
-    HeartOutlined,
     QuestionCircleOutlined,
     ReadOutlined,
     SearchOutlined,
@@ -14,8 +12,6 @@ import {
     TagOutlined,
     LeftOutlined,
     RightOutlined,
-    UpOutlined,
-    DownOutlined,
     VerticalAlignTopOutlined,
     VerticalAlignBottomOutlined
 } from "@ant-design/icons";
@@ -58,43 +54,37 @@ export const promptItems: PromptsProps['items'] = [
     {
         key: '2',
         label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '完成一个批改作业任务'),
-        description: '如何进行作业批改?【共6步】',
+        description: '如何进行作业批改?【共5步】',
         children: [
             {
                 key: '2-1',
                 icon: <TagOutlined />,
                 label: `第一步: 点击文件上传,上传作业原题、答案到附件`,
-                description: `请帮我保存作业原题和答案, 作业标题: [5.14xxx作业], 学科: [英语]`,
+                description: `请帮我保存作业原题和答案, 作业标题: xxx作业, 学科: 英语`,
             },
             {
                 key: '2-2',
                 icon: <TagOutlined />,
                 label: `第二步: 输入刚才保存的作业标题, 发布作业给某班级`,
-                description: `发布[xxx作业]给[xxx班级],提交截止时间[5](非必填,默认24小时)`,
+                description: `发布xxx作业给xxx班级,提交截止时间5(非必填,默认24小时)`,
             },
             {
                 key: '2-3',
                 icon: <TagOutlined />,
                 label: `第三步: 由学生自己或老师上传作业答题卡照片到附件`,
-                description: `我要提交作业, 作业标题: [xxx作业], 学生名: [张三]`,
+                description: `我要提交作业, 作业标题: xxx作业, 学生名: 张三`,
             },
             {
                 key: '2-4',
                 icon: <TagOutlined />,
-                label: `第四步: 告诉Ai自动批改哪个班级的作业`,
-                description: `异步执行作业批改, 作业标题: [xxx作业], 班级名: [xxx班级], 学科:[xxx学科](非必填, 不填代表全学科)`,
+                label: `第四步: 等待Ai批改完成后查询`,
+                description: `帮我查询作业批改结果, 作业标题: xxx作业, 班级名: xxx班。请将获得的数据转换为markdown的table形式展现, 其中横轴为`,
             },
             {
                 key: '2-5',
                 icon: <TagOutlined />,
-                label: `第五步: 等待Ai批改完成后查询`,
-                description: `帮我查询作业批改结果, 作业标题: [xxx作业], 班级名: [xxx班级], 学科:[xxx学科](非必填, 不填代表全学科), 学生名: [张三](非必填, 不填代表全班)`,
-            },
-            {
-                key: '2-6',
-                icon: <TagOutlined />,
-                label: `第六步: 对Ai批改的结果进行人工干预, 此操作不会修改Ai批改结果`,
-                description: `对批改结果进行人工批改, 作业批改结果id: [12345], 人工批改意见: [xxxxxxxxxxxxxxxxxxxxxxxxxxxx]`,
+                label: `第五步: 对Ai批改的结果进行人工干预, 此操作不会修改Ai批改结果`,
+                description: `对批改结果进行人工批改, 作业批改结果id: 12345, 人工批改意见: xxxxxxxxxxxxxxxxxxxxxxxxxxxx`,
             }
         ],
     }
