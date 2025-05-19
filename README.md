@@ -103,6 +103,12 @@ npm install markdown-it --save
 npm install @types/markdown-it --save-dev
 ```
 
+渲染HTML标签
+```shell
+npm install react-markdown rehype-raw dompurify
+```
+
+
 代码高亮
 ```shell
 npm install highlight.js
