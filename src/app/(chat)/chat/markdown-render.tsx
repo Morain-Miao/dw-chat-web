@@ -35,9 +35,22 @@ function isPureHTML(content: string) {
 
 // 检查是否为```html语法块
 function extractHtmlCodeBlock(content: string): string | null {
-    // 匹配```html\n...\n```
-    const match = content.match(/^```html\n([\s\S]*?)\n```$/i);
-    return match ? match[1] : null;
+    // 允许结尾```前有0个或多个空格或换行
+    const match = content.match(/^```html\s*\n([\s\S]*?)\n*```$/i);
+    if (match) {
+        return match[1];
+    }
+    return null;
+}
+
+// 提取<body>标签内容
+function extractBody(html: string): string {
+    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    if (bodyMatch) {
+        return bodyMatch[1];
+    }
+    // 如果没有body标签，直接返回原内容
+    return html;
 }
 
 /**
@@ -49,8 +62,9 @@ const MarkdownRender = (props: Props) => {
     const safeContent = DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
 
     if (htmlBlock) {
-        // 如果是```html语法块，直接渲染块内HTML
-        const safeHtml = DOMPurify.sanitize(htmlBlock, { USE_PROFILES: { html: true } });
+        // 如果是```html语法块，自动提取<body>内容
+        const bodyContent = extractBody(htmlBlock);
+        const safeHtml = DOMPurify.sanitize(bodyContent, { USE_PROFILES: { html: true } });
         return (
             <Typography>
                 <div className="markdown-body" dangerouslySetInnerHTML={{ __html: safeHtml }} />
