@@ -28,9 +28,40 @@ const Table = (props: any) => (
 const Th = (props: any) => (
   <th className="markdown-th">{props.children}</th>
 );
-const Td = (props: any) => (
-  <td className="markdown-td">{props.children}</td>
-);
+const Td = (props: any) => {
+  function renderWithMarkdown(children: any): any {
+    if (typeof children === 'string') {
+      // 只对看起来像 markdown 的字符串做二次渲染
+      if (/[*_#`\[\]-]/.test(children)) {
+        const content = children.replace(/\n/g, '<br />');
+        return (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+          >
+            {content}
+          </ReactMarkdown>
+        );
+      } else {
+        // 普通字符串直接渲染，保留换行
+        return children.split('\n').map((line, idx, arr) =>
+          idx < arr.length - 1 ? [line, <br key={idx} />] : line
+        );
+      }
+    }
+    if (Array.isArray(children)) {
+      return children.map((child, idx) => (
+        <React.Fragment key={idx}>{renderWithMarkdown(child)}</React.Fragment>
+      ));
+    }
+    // 如果是 React 元素，直接返回
+    if (React.isValidElement(children)) {
+      return children;
+    }
+    return children;
+  }
+  return <td className="markdown-td">{renderWithMarkdown(props.children)}</td>;
+};
 
 type Props = {
     content: string;

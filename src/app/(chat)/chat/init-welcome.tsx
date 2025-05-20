@@ -78,7 +78,7 @@ export const promptItems: PromptsProps['items'] = [
                 key: '2-4',
                 icon: <TagOutlined />,
                 label: `第四步: 等待Ai批改完成后查询`,
-                description: `帮我查询作业批改结果, 作业标题: xxx作业, 班级名: xxx班。请将获得的数据转换为markdown的table形式展现, 其中横轴为`,
+                description: `帮我查询作业批改结果, 作业标题: xxx作业, 班级名: xxx班。请将获得的数据转换为markdown的table形式展现, Ai批改结果由于过长, 希望你能对其进行总结后再展示。表格中的Id字段不要省略。`,
             },
             {
                 key: '2-5',
